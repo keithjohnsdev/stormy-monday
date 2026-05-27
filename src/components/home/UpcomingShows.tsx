@@ -80,7 +80,7 @@ export default function UpcomingShows({ shows }: Props) {
                       {show.startTime && `${show.startTime}`}
                       {show.coverCharge && ` · ${show.coverCharge}`}
                     </span>
-                    {show.ticketLink && (
+                    {show.ticketed && show.ticketLink ? (
                       <a
                         href={show.ticketLink}
                         target="_blank"
@@ -89,7 +89,16 @@ export default function UpcomingShows({ shows }: Props) {
                       >
                         Tickets →
                       </a>
-                    )}
+                    ) : show.artistWebsite ? (
+                      <a
+                        href={show.artistWebsite}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+                      >
+                        Website →
+                      </a>
+                    ) : null}
                   </div>
                 </div>
 

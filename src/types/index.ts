@@ -6,7 +6,9 @@ export interface Show {
   genre: string       // e.g. "Live Jazz", "Blues Trio", "DJ Set"
   description?: string
   artistPhoto?: string
+  ticketed?: boolean   // if true, show a "Tickets →" link using ticketLink
   ticketLink?: string
+  artistWebsite?: string // if set, show a "Website →" link
   coverCharge?: string // e.g. "$10" or "Free"
   featured: boolean
 }

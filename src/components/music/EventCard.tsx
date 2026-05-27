@@ -66,7 +66,7 @@ export default function EventCard({ show }: Props) {
               <span>Walk-in welcome</span>
             )}
           </div>
-          {show.ticketLink ? (
+          {show.ticketed && show.ticketLink ? (
             <a
               href={show.ticketLink}
               target="_blank"
@@ -74,6 +74,15 @@ export default function EventCard({ show }: Props) {
               className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
             >
               Tickets →
+            </a>
+          ) : show.artistWebsite ? (
+            <a
+              href={show.artistWebsite}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+            >
+              Website →
             </a>
           ) : (
             <span className="text-xs text-storm-muted">Free · Walk-in</span>

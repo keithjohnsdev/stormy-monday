@@ -29,6 +29,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
   const [artistId, setArtistId] = useState('')
   const [date, setDate] = useState('')
   const [featured, setFeatured] = useState(false)
+  const [ticketed, setTicketed] = useState(false)
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -53,7 +54,9 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
       startTime: '8pm',
       genre: selectedArtist.genre,
       description: selectedArtist.description,
-      ticketLink: selectedArtist.website,
+      ticketed,
+      ticketLink: '',
+      artistWebsite: selectedArtist.website || '',
       coverCharge: selectedArtist.defaultCoverCharge,
       featured,
       status: 'published',
@@ -62,6 +65,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
     setArtistId('')
     setDate('')
     setFeatured(false)
+    setTicketed(false)
   }
 
   function removeShow(id: string) {
@@ -128,12 +132,20 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
         )}
 
         <div className="flex items-center justify-between gap-4">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} className="accent-amber-500 w-4 h-4" />
-            <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>
-              Featured <span className={dk('text-gray-500', 'text-gray-400')}>(highlighted on homepage)</span>
-            </span>
-          </label>
+          <div className="flex items-center gap-5">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} className="accent-amber-500 w-4 h-4" />
+              <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>
+                Featured <span className={dk('text-gray-500', 'text-gray-400')}>(highlighted on homepage)</span>
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" checked={ticketed} onChange={e => setTicketed(e.target.checked)} className="accent-amber-500 w-4 h-4" />
+              <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>
+                Ticketed <span className={dk('text-gray-500', 'text-gray-400')}>(shows ticket link on card)</span>
+              </span>
+            </label>
+          </div>
           <button onClick={addShow} disabled={!artistId || !date}
             className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white font-semibold px-5 py-2 rounded text-sm transition-colors">
             Add Show

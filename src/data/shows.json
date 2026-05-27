@@ -7,7 +7,9 @@
     "startTime": "8pm",
     "genre": "Singer/Songwriter",
     "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
-    "ticketLink": "https://www.keithjohnsmusic.com",
+    "ticketed": false,
+    "ticketLink": "",
+    "artistWebsite": "https://www.keithjohnsmusic.com",
     "coverCharge": "Free",
     "featured": true,
     "status": "published"
@@ -20,7 +22,9 @@
     "startTime": "8pm",
     "genre": "Live Jazz",
     "description": "A four-piece jazz ensemble bringing standards and originals to the Alton Road room.",
+    "ticketed": false,
     "ticketLink": "",
+    "artistWebsite": "",
     "coverCharge": "Free",
     "featured": true,
     "status": "published"
@@ -33,7 +37,9 @@
     "startTime": "8pm",
     "genre": "Solo Guitar & Vocals",
     "description": "Miami-based singer-songwriter blending Latin folk with soul.",
+    "ticketed": false,
     "ticketLink": "",
+    "artistWebsite": "",
     "coverCharge": "Free",
     "featured": false,
     "status": "published"
@@ -46,7 +52,9 @@
     "startTime": "8pm",
     "genre": "Blues",
     "description": "Classic electric blues — three-piece, loud in all the right ways.",
-    "ticketLink": "https://www.instagram.com/stormymondaymia/",
+    "ticketed": false,
+    "ticketLink": "",
+    "artistWebsite": "https://www.instagram.com/stormymondaymia/",
     "coverCharge": "Free",
     "featured": true,
     "status": "published"
@@ -59,7 +67,9 @@
     "startTime": "8pm",
     "genre": "Singer/Songwriter",
     "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
-    "ticketLink": "https://www.keithjohnsmusic.com",
+    "ticketed": false,
+    "ticketLink": "",
+    "artistWebsite": "https://www.keithjohnsmusic.com",
     "coverCharge": "Free",
     "featured": false,
     "status": "published"
