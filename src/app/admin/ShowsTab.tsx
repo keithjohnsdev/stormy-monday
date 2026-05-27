@@ -30,6 +30,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
   const [date, setDate] = useState('')
   const [featured, setFeatured] = useState(false)
   const [ticketed, setTicketed] = useState(false)
+  const [ticketLink, setTicketLink] = useState('')
   const [status, setStatus] = useState<SaveStatus>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -55,7 +56,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
       genre: selectedArtist.genre,
       description: selectedArtist.description,
       ticketed,
-      ticketLink: '',
+      ticketLink: ticketed ? ticketLink.trim() : '',
       artistWebsite: selectedArtist.website || '',
       coverCharge: selectedArtist.defaultCoverCharge,
       featured,
@@ -66,6 +67,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
     setDate('')
     setFeatured(false)
     setTicketed(false)
+    setTicketLink('')
   }
 
   function removeShow(id: string) {
@@ -140,7 +142,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
               </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input type="checkbox" checked={ticketed} onChange={e => setTicketed(e.target.checked)} className="accent-amber-500 w-4 h-4" />
+              <input type="checkbox" checked={ticketed} onChange={e => { setTicketed(e.target.checked); if (!e.target.checked) setTicketLink('') }} className="accent-amber-500 w-4 h-4" />
               <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>
                 Ticketed <span className={dk('text-gray-500', 'text-gray-400')}>(shows ticket link on card)</span>
               </span>
@@ -151,6 +153,21 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
             Add Show
           </button>
         </div>
+
+        {ticketed && (
+          <div>
+            <label className={`text-xs font-semibold uppercase tracking-wide block mb-1 ${dk('text-gray-400', 'text-gray-500')}`}>
+              Ticket URL
+            </label>
+            <input
+              type="url"
+              value={ticketLink}
+              onChange={e => setTicketLink(e.target.value)}
+              placeholder="https://..."
+              className={inputCls}
+            />
+          </div>
+        )}
       </div>
 
       {/* Upcoming shows */}

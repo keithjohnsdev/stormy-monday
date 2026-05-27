@@ -154,12 +154,14 @@ function CalendarTab({
   artist,
   bookedDates,
   myBookedMonths,
+  openMonths,
   gigDetails,
   onBooked,
 }: {
   artist: SessionArtist
   bookedDates: Set<string>
   myBookedMonths: Set<string>
+  openMonths: string[]
   gigDetails: GigDetails
   onBooked: (date: string) => void
 }) {
@@ -170,10 +172,13 @@ function CalendarTab({
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Three calendar months: current + next two (handles year rollover automatically)
-  const months = Array.from({ length: 3 }, (_, i) => {
+  // Show only months admin has opened for booking (within the next 6 months)
+  const months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
     return { year: d.getFullYear(), month: d.getMonth() }
+  }).filter(({ year, month }) => {
+    const key = `${year}-${String(month + 1).padStart(2, '0')}`
+    return openMonths.includes(key)
   })
 
   function handleDayClick(d: Date) {
@@ -315,72 +320,82 @@ function CalendarTab({
         </div>
       )}
 
-      {/* Calendars */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {months.map(({ year, month }) => (
-          <div key={`${year}-${month}`} className="bg-storm-dark border border-storm-border p-6">
-            {renderMonth(year, month)}
-          </div>
-        ))}
-      </div>
-
-      {/* Legend */}
-      <div className="flex flex-wrap gap-5 text-xs text-storm-muted">
-        <span className="flex items-center gap-2">
-          <span className="w-5 h-5 border border-storm-gold/30 rounded flex-shrink-0" />
-          Available (Mon / Fri)
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="w-5 h-5 bg-storm-gold rounded flex-shrink-0" />
-          Selected
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-50 line-through text-storm-muted text-center leading-5">·</span>
-          Already booked
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-30" />
-          Your month is full
-        </span>
-      </div>
-
-      {/* Confirm panel */}
-      {selected && selectedInfo && bookingState !== 'booked' && (
-        <div className="border border-storm-gold/30 bg-storm-card p-6 grid gap-4">
-          <div>
-            <p className="text-xs text-storm-muted uppercase tracking-widest mb-2">Confirm Booking</p>
-            <p className="text-storm-cream text-lg font-semibold">{selectedInfo.label}</p>
-            <div className="mt-2 flex flex-wrap gap-4 text-sm">
-              <span className="text-storm-muted">
-                🕗 {gigDetails.performanceTime}
-              </span>
-              <span className="text-storm-gold">
-                {selectedInfo.dayType} rate: {selectedInfo.rate}
-              </span>
-            </div>
-          </div>
-          <p className="text-storm-muted text-xs leading-relaxed">
-            By confirming, this date is added to the Stormy Monday schedule and visible on the public site.
-          </p>
-          {(bookingState === 'error') && (
-            <p className="text-red-400 text-sm">{errorMsg}</p>
-          )}
-          <div className="flex gap-3 flex-wrap">
-            <button
-              onClick={() => { setSelected(null); setBookingState('idle') }}
-              className="px-5 py-2.5 text-sm text-storm-muted border border-storm-border hover:text-storm-cream hover:border-storm-muted transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmBooking}
-              disabled={bookingState === 'booking'}
-              className="px-6 py-2.5 text-sm bg-storm-gold text-storm-black font-semibold hover:bg-storm-gold/90 disabled:opacity-50 transition-colors"
-            >
-              {bookingState === 'booking' ? 'Booking…' : 'Confirm Booking →'}
-            </button>
-          </div>
+      {months.length === 0 ? (
+        /* No months open for booking */
+        <div className="border border-storm-border px-6 py-12 text-center">
+          <p className="text-storm-cream text-sm mb-2">No dates are currently open for booking.</p>
+          <p className="text-storm-muted text-xs">Check back soon or contact the venue directly.</p>
         </div>
+      ) : (
+        <>
+          {/* Calendars */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {months.map(({ year, month }) => (
+              <div key={`${year}-${month}`} className="bg-storm-dark border border-storm-border p-6">
+                {renderMonth(year, month)}
+              </div>
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap gap-5 text-xs text-storm-muted">
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 border border-storm-gold/30 rounded flex-shrink-0" />
+              Available (Mon / Fri)
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 bg-storm-gold rounded flex-shrink-0" />
+              Selected
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-50 line-through text-storm-muted text-center leading-5">·</span>
+              Already booked
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-30" />
+              Your month is full
+            </span>
+          </div>
+
+          {/* Confirm panel */}
+          {selected && selectedInfo && bookingState !== 'booked' && (
+            <div className="border border-storm-gold/30 bg-storm-card p-6 grid gap-4">
+              <div>
+                <p className="text-xs text-storm-muted uppercase tracking-widest mb-2">Confirm Booking</p>
+                <p className="text-storm-cream text-lg font-semibold">{selectedInfo.label}</p>
+                <div className="mt-2 flex flex-wrap gap-4 text-sm">
+                  <span className="text-storm-muted">
+                    🕗 {gigDetails.performanceTime}
+                  </span>
+                  <span className="text-storm-gold">
+                    {selectedInfo.dayType} rate: {selectedInfo.rate}
+                  </span>
+                </div>
+              </div>
+              <p className="text-storm-muted text-xs leading-relaxed">
+                By confirming, this date is added to the Stormy Monday schedule and visible on the public site.
+              </p>
+              {(bookingState === 'error') && (
+                <p className="text-red-400 text-sm">{errorMsg}</p>
+              )}
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={() => { setSelected(null); setBookingState('idle') }}
+                  className="px-5 py-2.5 text-sm text-storm-muted border border-storm-border hover:text-storm-cream hover:border-storm-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmBooking}
+                  disabled={bookingState === 'booking'}
+                  className="px-6 py-2.5 text-sm bg-storm-gold text-storm-black font-semibold hover:bg-storm-gold/90 disabled:opacity-50 transition-colors"
+                >
+                  {bookingState === 'booking' ? 'Booking…' : 'Confirm Booking →'}
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
     </div>
@@ -554,9 +569,11 @@ function GigDetailsTab({ gigDetails }: { gigDetails: GigDetails }) {
 export default function MusicianClient({
   initialShows,
   gigDetails,
+  openMonths,
 }: {
   initialShows: StoredShow[]
   gigDetails: GigDetails
+  openMonths: string[]
 }) {
   const [artist, setArtist] = useState<SessionArtist | null>(null)
   const [sessionLoading, setSessionLoading] = useState(true)
@@ -658,6 +675,7 @@ export default function MusicianClient({
                 artist={artist}
                 bookedDates={allBookedDates}
                 myBookedMonths={myBookedMonths}
+                openMonths={openMonths}
                 gigDetails={gigDetails}
                 onBooked={date =>
                   setLocalBookedDates(prev => new Set([...prev, date]))

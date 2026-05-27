@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/session'
 import artistsData from '@/data/artists.json'
+import bookingConfigData from '@/data/booking-config.json'
 import type { Artist, StoredShow } from '@/types'
 
 const SHOWS_PATH = 'src/data/shows.json'
@@ -90,6 +91,15 @@ export async function POST(req: NextRequest) {
   const currentShows: StoredShow[] = file?.data ?? []
   const currentSha = file?.sha
 
+  // Check that this month is open for musician booking
+  const monthKey = date.slice(0, 7) // 'YYYY-MM'
+  if (!bookingConfigData.openMonths.includes(monthKey)) {
+    return NextResponse.json(
+      { error: 'That month is not currently open for booking. Contact the venue.' },
+      { status: 409 }
+    )
+  }
+
   // Check for date conflict (anyone already booked this exact date)
   const conflict = currentShows.find(s => s.date === date && s.status === 'published')
   if (conflict) {
@@ -97,7 +107,6 @@ export async function POST(req: NextRequest) {
   }
 
   // Check for month conflict (this artist already has a show in the same month)
-  const monthKey = date.slice(0, 7) // 'YYYY-MM'
   const monthConflict = currentShows.find(
     s => s.artistId === artist.id && s.date.startsWith(monthKey) && s.status === 'published'
   )

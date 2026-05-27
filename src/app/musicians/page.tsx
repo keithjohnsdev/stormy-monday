@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { StoredShow } from '@/types'
 import showsData from '@/data/shows.json'
+import bookingConfigData from '@/data/booking-config.json'
 import { content } from '@/content'
 import MusicianClient from './MusicianClient'
 
@@ -14,6 +15,7 @@ export default function MusicianPortalPage() {
     <MusicianClient
       initialShows={showsData as StoredShow[]}
       gigDetails={content.gigDetails}
+      openMonths={bookingConfigData.openMonths}
     />
   )
 }

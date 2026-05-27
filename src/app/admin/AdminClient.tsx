@@ -5,10 +5,11 @@ import type { content } from '@/content'
 import type { Artist, StoredShow } from '@/types'
 import ArtistsTab from './ArtistsTab'
 import ShowsTab from './ShowsTab'
+import BookingCalendarTab from './BookingCalendarTab'
 
 type ContentData = typeof content
 type Status = 'idle' | 'saving' | 'saved' | 'error'
-type Tab = 'content' | 'artists' | 'shows'
+type Tab = 'content' | 'artists' | 'shows' | 'calendar'
 
 const SESSION_KEY = 'sm_admin_pw'
 
@@ -195,10 +196,12 @@ export default function AdminClient({
   initialData,
   initialArtists,
   initialShows,
+  initialOpenMonths,
 }: {
   initialData: ContentData
   initialArtists: Artist[]
   initialShows: StoredShow[]
+  initialOpenMonths: string[]
 }) {
   const [password, setPassword] = useState<string | null>(null)
   const [unlockFailed, setUnlockFailed] = useState(false)
@@ -301,7 +304,7 @@ export default function AdminClient({
           </div>
           <div className="max-w-3xl mx-auto px-6 flex items-center justify-between mt-3">
             <div className="flex gap-1">
-              {(['content', 'artists', 'shows'] as Tab[]).map(t => (
+              {(['content', 'artists', 'shows', 'calendar'] as Tab[]).map(t => (
                 <button
                   key={t}
                   onClick={() => setActiveTab(t)}
@@ -327,6 +330,16 @@ export default function AdminClient({
 
           {activeTab === 'shows' && (
             <ShowsTab initialShows={initialShows} artists={initialArtists} password={password ?? ''} isDark={isDark} onAuthError={() => { sessionStorage.removeItem(SESSION_KEY); setPassword(null) }} />
+          )}
+
+          {activeTab === 'calendar' && (
+            <BookingCalendarTab
+              shows={initialShows}
+              initialOpenMonths={initialOpenMonths}
+              password={password ?? ''}
+              isDark={isDark}
+              onAuthError={() => { sessionStorage.removeItem(SESSION_KEY); setPassword(null) }}
+            />
           )}
 
           {activeTab === 'content' && <>

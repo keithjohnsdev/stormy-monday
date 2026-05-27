@@ -49,7 +49,8 @@ export default function UpcomingShows({ shows }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {shows.slice(0, 3).map((show, i) => (
             <FadeIn key={show.id} delay={i * 120}>
-              <div className="relative bg-storm-card border border-storm-border overflow-hidden hover:border-storm-gold/50 hover:-translate-y-1 transition-all duration-300 group h-full">
+              <div className="relative bg-storm-card border border-storm-border overflow-hidden hover:border-storm-gold/50 hover:-translate-y-1 transition-all duration-300 group h-full cursor-pointer">
+                <Link href="/music" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
 
                 {/* Artist photo background */}
                 {show.artistPhoto && (
@@ -85,7 +86,7 @@ export default function UpcomingShows({ shows }: Props) {
                         href={show.ticketLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+                        className="relative z-10 text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
                       >
                         Tickets →
                       </a>
@@ -94,7 +95,7 @@ export default function UpcomingShows({ shows }: Props) {
                         href={show.artistWebsite}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+                        className="relative z-10 text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
                       >
                         Website →
                       </a>

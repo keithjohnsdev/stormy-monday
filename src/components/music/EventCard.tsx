@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { Show } from '@/types'
 
 interface Props {
@@ -18,7 +19,8 @@ export default function EventCard({ show }: Props) {
   const { day, date } = formatDate(show.date)
 
   return (
-    <article className="bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group">
+    <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer">
+      <Link href="/music" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
       {/* Artist photo */}
       <div className="aspect-[4/3] bg-storm-dark relative overflow-hidden">
         {show.artistPhoto ? (
@@ -71,7 +73,7 @@ export default function EventCard({ show }: Props) {
               href={show.ticketLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+              className="relative z-10 text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
             >
               Tickets →
             </a>
@@ -80,7 +82,7 @@ export default function EventCard({ show }: Props) {
               href={show.artistWebsite}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
+              className="relative z-10 text-xs tracking-widest uppercase text-storm-gold hover:text-storm-gold-light transition-colors"
             >
               Website →
             </a>
