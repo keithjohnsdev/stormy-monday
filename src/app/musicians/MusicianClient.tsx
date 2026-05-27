@@ -172,6 +172,19 @@ function CalendarTab({
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
+  // Dismiss modal on Escape
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape' && selected && bookingState !== 'booking') {
+        setSelected(null)
+        setBookingState('idle')
+        setErrorMsg('')
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [selected, bookingState])
+
   // Show only months admin has opened for booking (within the next 6 months)
   const months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
@@ -357,41 +370,60 @@ function CalendarTab({
             </span>
           </div>
 
-          {/* Confirm panel */}
+          {/* Booking modal */}
           {selected && selectedInfo && bookingState !== 'booked' && (
-            <div className="border border-storm-gold/30 bg-storm-card p-6 grid gap-4">
-              <div>
-                <p className="text-xs text-storm-muted uppercase tracking-widest mb-2">Confirm Booking</p>
-                <p className="text-storm-cream text-lg font-semibold">{selectedInfo.label}</p>
-                <div className="mt-2 flex flex-wrap gap-4 text-sm">
-                  <span className="text-storm-muted">
-                    🕗 {gigDetails.performanceTime}
-                  </span>
-                  <span className="text-storm-gold">
-                    {selectedInfo.dayType} rate: {selectedInfo.rate}
-                  </span>
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+              onClick={e => {
+                if (e.target === e.currentTarget && bookingState !== 'booking') {
+                  setSelected(null)
+                  setBookingState('idle')
+                  setErrorMsg('')
+                }
+              }}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-storm-black/80 backdrop-blur-sm" />
+
+              {/* Panel */}
+              <div className="relative bg-storm-card border border-storm-gold/40 p-8 w-full max-w-sm grid gap-5 shadow-2xl">
+                {/* Header */}
+                <div>
+                  <p className="text-xs text-storm-muted uppercase tracking-widest mb-3">Confirm Booking</p>
+                  <p className="font-display text-xl text-storm-cream leading-tight">{selectedInfo.label}</p>
+                  <div className="mt-3 grid gap-1.5 text-sm">
+                    <span className="text-storm-muted">🕗 {gigDetails.performanceTime}</span>
+                    <span className="text-storm-gold font-medium">{selectedInfo.dayType} rate: {selectedInfo.rate}</span>
+                  </div>
                 </div>
-              </div>
-              <p className="text-storm-muted text-xs leading-relaxed">
-                By confirming, this date is added to the Stormy Monday schedule and visible on the public site.
-              </p>
-              {(bookingState === 'error') && (
-                <p className="text-red-400 text-sm">{errorMsg}</p>
-              )}
-              <div className="flex gap-3 flex-wrap">
-                <button
-                  onClick={() => { setSelected(null); setBookingState('idle') }}
-                  className="px-5 py-2.5 text-sm text-storm-muted border border-storm-border hover:text-storm-cream hover:border-storm-muted transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmBooking}
-                  disabled={bookingState === 'booking'}
-                  className="px-6 py-2.5 text-sm bg-storm-gold text-storm-black font-semibold hover:bg-storm-gold/90 disabled:opacity-50 transition-colors"
-                >
-                  {bookingState === 'booking' ? 'Booking…' : 'Confirm Booking →'}
-                </button>
+
+                {/* Disclaimer */}
+                <p className="text-storm-muted text-xs leading-relaxed border-t border-storm-border pt-4">
+                  By confirming, this date is added to the Stormy Monday schedule and visible on the public site within ~30 seconds.
+                </p>
+
+                {/* Error */}
+                {bookingState === 'error' && (
+                  <p className="text-red-400 text-sm -mt-1">{errorMsg}</p>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setSelected(null); setBookingState('idle'); setErrorMsg('') }}
+                    disabled={bookingState === 'booking'}
+                    className="flex-1 py-2.5 text-sm text-storm-muted border border-storm-border hover:text-storm-cream hover:border-storm-muted disabled:opacity-40 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmBooking}
+                    disabled={bookingState === 'booking'}
+                    className="flex-1 py-2.5 text-sm bg-storm-gold text-storm-black font-semibold hover:bg-storm-gold/90 disabled:opacity-50 transition-colors"
+                  >
+                    {bookingState === 'booking' ? 'Booking…' : 'Confirm →'}
+                  </button>
+                </div>
               </div>
             </div>
           )}
