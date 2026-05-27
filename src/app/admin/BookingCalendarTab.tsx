@@ -271,6 +271,9 @@ export default function BookingCalendarTab({
 
           {/* Approve / Unpublish button */}
           <div className={`mt-3 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
+            {isApproved && (
+              <p className="text-xs text-emerald-500 font-medium mb-2">✓ Month published</p>
+            )}
             <button
               onClick={() => toggleApproved(monthKey)}
               className={`w-full py-2 text-xs font-semibold rounded transition-colors ${
