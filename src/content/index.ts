@@ -1,11 +1,11 @@
 // Auto-generated — do not edit directly.
-// Last updated via content editor: 2026-05-14T18:52:15.547Z
+// Last updated via content editor: 2026-05-27T17:25:58.497Z
 
 export const content = {
 
   site: {
     name:            'Stormy Monday',
-    tagline:         'Learn the rules, then transcend them.',
+    tagline:         'When it rains, we pour.',
     address:         '820 Alton Road',
     city:            'Miami Beach, FL 33139',
     phone:           '(305) 555-0000',
