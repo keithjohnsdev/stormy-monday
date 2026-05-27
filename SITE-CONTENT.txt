@@ -1,0 +1,326 @@
+================================================================
+  STORMY MONDAY — WEBSITE CONTENT
+================================================================
+
+  HOW TO EDIT THIS DOCUMENT:
+
+  - Find the section you want to change
+  - Edit the text to the RIGHT of the colon on each line
+  - Do not change the labels (the words in CAPS before the colon)
+  - To leave something blank, just delete the text after the colon
+  - Save the file and send it back to Keith
+  - Changes go live within minutes of receiving it
+
+  Questions? Email Keith: keithjohnsdev@gmail.com
+
+================================================================
+
+
+
+
+================================================================
+  CONTACT INFORMATION
+================================================================
+
+  This information appears throughout the site — in the footer,
+  the contact page, and anywhere the phone or email shows up.
+  Update it here and it updates everywhere.
+
+PHONE: (305) 555-0000
+GENERAL EMAIL: hello@stormymondaymia.com
+EVENTS EMAIL: events@stormymondaymia.com
+PRESS EMAIL: press@stormymondaymia.com
+INSTAGRAM: @stormymondaymia
+TAGLINE: When it rains, we pour.
+
+
+
+
+================================================================
+  HOME PAGE
+================================================================
+
+  ---- Hero (the big opening image with text) ----
+
+HERO EYEBROW: 820 Alton Road · Miami Beach
+HERO HEADLINE: Stormy Monday
+HERO TAGLINE: When it rains, we pour.
+HERO BUTTON PRIMARY: Reserve a Table
+HERO BUTTON SECONDARY: Upcoming Shows
+
+
+  ---- Info Bar (the strip below the hero) ----
+
+INFO HOURS: Thu–Mon · 5pm–1am
+INFO LOCATION: 820 Alton Rd, Miami Beach
+INFO HAPPY HOUR: Daily 5–7pm
+INFO RESERVATION BUTTON: Make a Reservation
+
+
+  ---- Press Quotes (homepage strip) ----
+
+HOME PRESS 1 OUTLET: The Infatuation
+HOME PRESS 1 QUOTE: Balances playfulness with craft expertise.
+HOME PRESS 1 SCORE: 8.1 / 10
+
+HOME PRESS 2 OUTLET: Timeout Miami
+HOME PRESS 2 QUOTE: An intimate, music-forward bar with serious cocktail chops.
+HOME PRESS 2 SCORE: Featured
+
+HOME PRESS 3 OUTLET: Miami New Times
+HOME PRESS 3 QUOTE: Craft cocktails and chef-driven bites pop up on Alton Road.
+HOME PRESS 3 SCORE: Featured
+
+HOME PRESS 4 OUTLET: Resident Magazine
+HOME PRESS 4 QUOTE: Refined cocktails and soulful vibes.
+HOME PRESS 4 SCORE: Featured
+
+
+
+
+================================================================
+  ABOUT PAGE
+================================================================
+
+  ---- Our Story ----
+
+STORY HEADING: The Bar We Always Wanted
+STORY PARAGRAPH 1: Stormy Monday is named after the blues standard — a song about the weight of Monday and the hope that the weekend brings. The name felt right for a bar that takes the craft seriously but doesn't take itself too seriously.
+STORY PARAGRAPH 2: We took over 820 Alton Road, the longtime home of Macchialina, and turned it into something quieter and more personal. Fifty-five seats. Ten at the bar. Designed for conversations that run long, for rounds that arrive without being rushed.
+STORY PARAGRAPH 3: The compass in our logo points in every direction — toward wherever you need to go, and toward the bar when you need to come back. Direction, movement, and return.
+STORY PULL QUOTE: "This project is really about two Miami guys getting to build the bar we always wanted to hang out in."
+
+
+  ---- Philosophy Panels (three columns below the story) ----
+
+PHILOSOPHY 1 HEADING: The Drinks
+PHILOSOPHY 1 BODY: Balanced and technique-driven. No smoke-filled cloches, no TikTok theatrics. We care about what's in your glass more than the production around it.
+
+PHILOSOPHY 2 HEADING: The Food
+PHILOSOPHY 2 BODY: Bar food from a Michelin kitchen. Chef Seth's snacks are built for drinking alongside — serious technique, relaxed format.
+
+PHILOSOPHY 3 HEADING: The Music
+PHILOSOPHY 3 BODY: Live every Monday and Friday. The playlist on other nights fits the room. We named the bar after a blues standard for a reason.
+
+
+  ---- Team ----
+
+TEAM MEMBER 1 NAME: James MacInnes
+TEAM MEMBER 1 ROLE: Founder · Bar
+TEAM MEMBER 1 BIO: A Cutler Bay native who has shaped some of Miami's most respected cocktail programs — KYU, Kaori, KLAW, and Wynwood's Shiso. With Stormy Monday, he built the bar he always wanted to hang out in.
+
+TEAM MEMBER 2 NAME: Seth Blumenthal
+TEAM MEMBER 2 ROLE: Chef
+TEAM MEMBER 2 BIO: Chicago native, Miami-based for nearly a decade. Former chef de cuisine at Alter and at Le Jardinier during its Michelin-starred run. His food is technique-driven without being precious about it.
+
+TEAM MEMBER 3 NAME: Jason Kipnis
+TEAM MEMBER 3 ROLE: Partner
+TEAM MEMBER 3 BIO: Former MLB All-Star. A partner in the project and the kind of guy who shows up to make things work.
+
+
+
+
+================================================================
+  MENU
+================================================================
+
+MENU SUBHEADING: Serious about what's in your glass. Relaxed about everything else.
+HAPPY HOUR LABEL: Happy Hour
+HAPPY HOUR DESCRIPTION: Daily 5–7pm · Bar seating only · Exclusive specials
+MENU DISCLAIMER: Menu is seasonal and subject to change. Ask your bartender about tonight's specials.
+
+
+  ---- Cocktails ----
+  (To add a cocktail, copy a block and increment the number.
+   NOTE is optional — leave it blank if you don't want a note.)
+
+COCKTAIL 1 NAME: Dahlia
+COCKTAIL 1 DESC: Mezcal, bitter bianco, smoked red grape, Thai basil
+COCKTAIL 1 NOTE: Earthy and quietly complex
+
+COCKTAIL 2 NAME: Intercontinental
+COCKTAIL 2 DESC: Barrel-aged spirit blend, palm sugar, shea butter, palo santo
+COCKTAIL 2 NOTE: Rich and deep
+
+COCKTAIL 3 NAME: Sidewalk Spritz
+COCKTAIL 3 DESC: Aperitivo, orange, tomate de árbol, carbonated Chablis
+COCKTAIL 3 NOTE: Playful — built for Miami's golden hour
+
+COCKTAIL 4 NAME: The Perfect Storm
+COCKTAIL 4 DESC: A refined take on the dark and stormy
+COCKTAIL 4 NOTE:
+
+COCKTAIL 5 NAME: Martinelli Sling
+COCKTAIL 5 DESC: Ask your bartender
+COCKTAIL 5 NOTE:
+
+COCKTAIL 6 NAME: UMamey
+COCKTAIL 6 DESC: Umami-forward · Ask your bartender
+COCKTAIL 6 NOTE:
+
+COCKTAIL 7 NAME: cálmate
+COCKTAIL 7 DESC: Non-alcoholic · Ask your bartender
+COCKTAIL 7 NOTE: Mocktail
+
+
+  ---- Food ----
+  (To add a food item, copy a block and increment the number.
+   DESC is optional — leave it blank if there's no description.)
+
+FOOD 1 NAME: Foie Gras Xiao Long Bao
+FOOD 1 DESC: Seasonal jam · hand-shaped chopsticks
+
+FOOD 2 NAME: Smoked Mahi Mahi Fish Dip
+FOOD 2 DESC: Shokupan · house pickles
+
+FOOD 3 NAME: Puffed Beef Tendon
+FOOD 3 DESC: Chili lime dipping sauce
+
+FOOD 4 NAME: Smoked Beemster Cheese
+FOOD 4 DESC: Crispy dough · fermented South Florida honey
+
+FOOD 5 NAME: Charred Bavette Skewers
+FOOD 5 DESC: $12 during happy hour
+
+FOOD 6 NAME: Chicken Katsu Sando
+FOOD 6 DESC: Mango mustard
+
+FOOD 7 NAME: Pomegranate Foam Oysters
+FOOD 7 DESC:
+
+FOOD 8 NAME: Strawberry-Cream Cannoli
+FOOD 8 DESC: The pastelito
+
+
+
+
+================================================================
+  MUSIC PAGE
+================================================================
+
+MUSIC SUBHEADING: Live every Monday and Friday, 8–11pm. Follow @stormymondaymia for announcements.
+
+MUSIC NIGHT 1 DAY: Monday
+MUSIC NIGHT 1 DETAIL: Live band · 8–11pm
+
+MUSIC NIGHT 2 DAY: Friday
+MUSIC NIGHT 2 DETAIL: Live music · 8–11pm
+
+MUSIC PROGRAMMING TAGLINE: Named after the blues standard — music is part of who we are, not an afterthought.
+
+
+
+
+================================================================
+  CONTACT PAGE
+================================================================
+
+  ---- Hours ----
+  (For LIVE MUSIC lines: fill in the time range, or leave blank
+   if there's no live music that night.)
+
+HOURS MONDAY: 5pm – 1am
+HOURS MONDAY MUSIC: 8pm – 11pm
+
+HOURS TUESDAY: Closed
+HOURS TUESDAY MUSIC:
+
+HOURS WEDNESDAY: Closed
+HOURS WEDNESDAY MUSIC:
+
+HOURS THURSDAY: 5pm – 1am
+HOURS THURSDAY MUSIC:
+
+HOURS FRIDAY: 5pm – 1am
+HOURS FRIDAY MUSIC: 8pm – 11pm
+
+HOURS SATURDAY: 5pm – 1am
+HOURS SATURDAY MUSIC:
+
+HOURS SUNDAY: 5pm – 1am
+HOURS SUNDAY MUSIC:
+
+
+  ---- Other Contact Info ----
+
+PARKING INFO: Street parking on Alton Road and side streets. Lincoln Road garage nearby.
+
+
+
+
+================================================================
+  PRESS PAGE
+================================================================
+
+  ---- Full Press Coverage ----
+  (These are the full quotes that appear on the dedicated press page,
+   separate from the shorter homepage quotes above.)
+
+PRESS 1 OUTLET: The Infatuation
+PRESS 1 SCORE: 8.1 / 10
+PRESS 1 QUOTE: Balances playfulness with craft expertise. Happy hour runs daily 5–7pm with exclusive bar-only specials.
+PRESS 1 DATE: March 2026
+
+PRESS 2 OUTLET: Timeout Miami
+PRESS 2 SCORE: Featured
+PRESS 2 QUOTE: A new limited-run cocktail bar taking over the former home of Macchialina — an intimate, music-forward room.
+PRESS 2 DATE: March 2026
+
+PRESS 3 OUTLET: Miami New Times
+PRESS 3 SCORE: Featured
+PRESS 3 QUOTE: Craft cocktails and chef-driven bites pop up on Alton Road. Earthy and quietly complex.
+PRESS 3 DATE: March 2026
+
+PRESS 4 OUTLET: Resident Magazine
+PRESS 4 SCORE: Featured
+PRESS 4 QUOTE: Refined cocktails and soulful vibes. Serious about drinks but relaxed about everything else.
+PRESS 4 DATE: March 2026
+
+
+
+
+================================================================
+  PRIVATE EVENTS PAGE
+================================================================
+
+EVENTS SUBHEADING: An intimate South Beach space — perfect for buyouts, celebrations, and industry gatherings.
+
+EVENTS STAT 1 LABEL: Full Venue
+EVENTS STAT 1 VALUE: 55 guests
+
+EVENTS STAT 2 LABEL: Bar & Lounge
+EVENTS STAT 2 VALUE: Partial buyout
+
+EVENTS STAT 3 LABEL: Open
+EVENTS STAT 3 VALUE: Thu–Mon
+
+EVENTS PARAGRAPH 1: Stormy Monday is a 55-seat room with 10 bar seats — an ideal size for a dinner buyout, industry event, or intimate celebration that doesn't feel like a banquet hall.
+EVENTS PARAGRAPH 2: Custom cocktail menus, full kitchen support from Chef Seth, and live music arrangements are all available. We'll work with you on what makes sense for your event.
+
+EVENTS FORM HEADING: Get in Touch
+
+
+
+
+================================================================
+  GALLERY PAGE
+================================================================
+
+GALLERY SUBHEADING: Photos of the space, the drinks, the food, and the nights.
+GALLERY PHOTO CREDIT: Photography: Cleveland Jennings / @eatthecanvasllc
+GALLERY FOLLOW LABEL: Follow us for more
+
+
+
+
+================================================================
+  FOOTER
+================================================================
+
+FOOTER HOURS LINE 1: Thursday–Monday
+FOOTER HOURS LINE 2: 5pm – 1am
+
+
+================================================================
+  END OF DOCUMENT
+================================================================

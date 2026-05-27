@@ -1,0 +1,34 @@
+[
+  {
+    "id": "artist-keithjohns",
+    "name": "Keith Johns",
+    "genre": "Singer/Songwriter",
+    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
+    "website": "https://www.keithjohnsmusic.com",
+    "defaultCoverCharge": "Free"
+  },
+  {
+    "id": "artist-blueroomquartet",
+    "name": "The Blue Room Quartet",
+    "genre": "Live Jazz",
+    "description": "A four-piece jazz ensemble bringing standards and originals to the Alton Road room.",
+    "website": "",
+    "defaultCoverCharge": "Free"
+  },
+  {
+    "id": "artist-elianaruiz",
+    "name": "Eliana Ruiz",
+    "genre": "Solo Guitar & Vocals",
+    "description": "Miami-based singer-songwriter blending Latin folk with soul.",
+    "website": "",
+    "defaultCoverCharge": "Free"
+  },
+  {
+    "id": "artist-altonroadblues",
+    "name": "The Alton Road Blues Band",
+    "genre": "Blues",
+    "description": "Classic electric blues — three-piece, loud in all the right ways.",
+    "website": "https://www.instagram.com/stormymondaymia/",
+    "defaultCoverCharge": "Free"
+  }
+]

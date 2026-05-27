@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THEME COLORS — Update these R G B channel values when Pantones arrive.
+   Format is "R G B" (no commas, no #) so Tailwind opacity modifiers work.
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --storm-black:       13 11 9;        /* #0d0b09 — page bg */
+  --storm-dark:        26 22 18;       /* #1a1612 — section bg */
+  --storm-card:        33 29 24;       /* #211d18 — card bg */
+  --storm-gold:        196 154 74;     /* #c49a4a — primary accent */
+  --storm-gold-light:  212 176 106;    /* #d4b06a — hover state */
+  --storm-cream:       240 235 227;    /* #f0ebe3 — primary text */
+  --storm-muted:       122 112 104;    /* #7a7068 — secondary text */
+  --storm-border:      46 40 32;       /* #2e2820 — borders */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background-color: rgb(var(--storm-gold));
+    color: rgb(var(--storm-black));
+  }
+
+  body {
+    background-color: rgb(var(--storm-black));
+  }
+}
+
+@layer components {
+  .gold-divider {
+    @apply w-12 h-px bg-storm-gold my-6;
+  }
+
+  .btn-primary {
+    @apply inline-block bg-storm-gold text-storm-black px-6 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-storm-gold-light hover:scale-[1.02] transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply inline-block border border-storm-gold text-storm-gold px-6 py-3 text-sm font-semibold tracking-widest uppercase hover:bg-storm-gold hover:text-storm-black hover:scale-[1.02] transition-all duration-200;
+  }
+}
+
+/* ── Collage float keyframes — rotation is baked in so it doesn't reset ─────── */
+
+@keyframes floatA {
+  0%, 100% { transform: rotate(-3deg) translateY(0px); }
+  50%       { transform: rotate(-3deg) translateY(-14px); }
+}
+@keyframes floatB {
+  0%, 100% { transform: rotate(4deg) translateX(0px); }
+  50%       { transform: rotate(4deg) translateX(10px); }
+}
+@keyframes floatC {
+  0%, 100% { transform: rotate(-1.5deg) translate(0px, 0px); }
+  33%       { transform: rotate(-1.5deg) translate(6px, -10px); }
+  66%       { transform: rotate(-1.5deg) translate(-4px, 5px); }
+}
+@keyframes floatD {
+  0%, 100% { transform: rotate(2.5deg) translateY(0px); }
+  50%       { transform: rotate(2.5deg) translateY(-12px); }
+}
+
+/* ── Animation keyframes ────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1)    translate(0,    0);    }
+  to   { transform: scale(1.08) translate(-2%, -1%); }
+}
+
+/* Infrequent, very faint lightning flash — on-brand, not distracting */
+@keyframes lightning {
+  0%, 87%, 90%, 93%, 100% { opacity: 0; }
+  88%, 91%                { opacity: 0.06; }
+  89%, 92%                { opacity: 0; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  /* Applied to hero image — alive even before video loads */
+  .animate-ken-burns {
+    animation: kenBurns 20s ease-in-out infinite alternate;
+  }
+
+  /* Periodic faint white flash on hero image panel */
+  .animate-lightning {
+    animation: lightning 14s ease-in-out infinite;
+  }
+
+  /* Hero text entrance — set animationDelay inline to stagger */
+  .animate-fade-up {
+    opacity: 0;
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  /* Navbar entrance */
+  .animate-slide-down {
+    animation: slideDown 0.5s ease-out forwards;
+  }
+}
