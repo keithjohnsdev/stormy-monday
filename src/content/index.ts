@@ -236,4 +236,16 @@ export const content = {
     followLabel:   'Follow',
   },
 
+  gigDetails: {
+    heading:         'Gig Details',
+    subheading:      'Everything you need to know about playing Stormy Monday.',
+    performanceTime: '8:00pm – 11:00pm',
+    mondayRate:      '$250',
+    fridayRate:      '$350',
+    parkingInfo:     'Street parking on Alton Road and side streets — self-pay. No reserved or comped spots.',
+    perksInfo:       'The bar provides a meal and two cocktails for performing artists.',
+    equipmentInfo:   'House PA includes a compact mixer and two powered speakers on stands. Bring your own cables, instrument, and any additional gear.',
+    additionalNotes: '',
+  },
+
 }

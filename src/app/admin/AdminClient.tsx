@@ -37,15 +37,15 @@ function LockScreen({ onUnlock, error }: { onUnlock: (pw: string) => void; error
   return (
     <div
       className="min-h-screen flex items-center justify-center px-6 bg-cover bg-center relative"
-      style={{ backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fd39b0c9-fc35-4a4e-96c7-e4639e0887d7/dect3i1-526cc16b-96f9-455d-9cf1-c3e876c54306.jpg/v1/fill/w_1280,h_720,q_75,strp/you_shall_not_pass___painting_by_me__by_martulen_dect3i1-fullview.jpg)' }}
+      style={{ backgroundImage: 'url(/gandalf-balrog.jpg)' }}
     >
       <div className="absolute inset-0 bg-black/55" />
       <div className="relative z-10 w-full max-w-sm text-center">
-        <h1 className="font-display text-5xl sm:text-6xl text-storm-gold mb-5 leading-tight [text-shadow:0_2px_12px_rgba(0,0,0,0.95)]">
-          You Shall Not Pass!
+        <h1 className="font-display text-6xl sm:text-7xl text-storm-gold mb-5 leading-tight uppercase tracking-widest [text-shadow:0_0_40px_rgba(196,154,74,0.6),0_2px_16px_rgba(0,0,0,1)]">
+          YOU SHALL NOT PASS!
         </h1>
-        <p className="text-storm-cream text-base mb-10 [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
-          Enter your password to continue.
+        <p className="text-storm-muted text-sm mb-10 uppercase tracking-[0.3em] [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
+          enter password
         </p>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <input
@@ -484,6 +484,21 @@ export default function AdminClient({
           <Section title="Gallery Page">
             <Field label="Subheading" value={data.gallery.subheading} onChange={u(['gallery', 'subheading'])} long rows={2} />
             <Field label="Photo Credit" value={data.gallery.photoCredit} onChange={u(['gallery', 'photoCredit'])} />
+          </Section>
+
+          <Section title="Gig Details (Musician Portal)">
+            <p className={`text-xs -mt-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              Shown to musicians when they log in at /musicians. Publish to update the portal.
+            </p>
+            <TwoCol>
+              <Field label="Monday Rate" value={data.gigDetails.mondayRate} onChange={u(['gigDetails', 'mondayRate'])} />
+              <Field label="Friday Rate" value={data.gigDetails.fridayRate} onChange={u(['gigDetails', 'fridayRate'])} />
+            </TwoCol>
+            <Field label="Performance Time" value={data.gigDetails.performanceTime} onChange={u(['gigDetails', 'performanceTime'])} />
+            <Field label="Parking Info" value={data.gigDetails.parkingInfo} onChange={u(['gigDetails', 'parkingInfo'])} long />
+            <Field label="Food & Drinks (perks)" value={data.gigDetails.perksInfo} onChange={u(['gigDetails', 'perksInfo'])} long />
+            <Field label="Equipment / PA" value={data.gigDetails.equipmentInfo} onChange={u(['gigDetails', 'equipmentInfo'])} long rows={3} />
+            <Field label="Additional Notes (optional)" value={data.gigDetails.additionalNotes} onChange={u(['gigDetails', 'additionalNotes'])} long rows={2} />
           </Section>
 
           <Section title="Footer">

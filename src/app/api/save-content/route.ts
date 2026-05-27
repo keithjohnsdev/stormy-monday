@@ -58,6 +58,18 @@ function generateIndexTs(d: ContentData): string {
 
   const eventParaLines = d.privateEvents.paragraphs.map(p => `      ${q(p)},`).join('\n')
 
+  const gigDetailsBlock = `  gigDetails: {
+    heading:         ${q(d.gigDetails.heading)},
+    subheading:      ${q(d.gigDetails.subheading)},
+    performanceTime: ${q(d.gigDetails.performanceTime)},
+    mondayRate:      ${q(d.gigDetails.mondayRate)},
+    fridayRate:      ${q(d.gigDetails.fridayRate)},
+    parkingInfo:     ${q(d.gigDetails.parkingInfo)},
+    perksInfo:       ${q(d.gigDetails.perksInfo)},
+    equipmentInfo:   ${q(d.gigDetails.equipmentInfo)},
+    additionalNotes: ${q(d.gigDetails.additionalNotes)},
+  },`
+
   return `// Auto-generated — do not edit directly.
 // Last updated via content editor: ${new Date().toISOString()}
 
@@ -213,6 +225,8 @@ ${eventParaLines}
     navigateLabel: 'Navigate',
     followLabel:   'Follow',
   },
+
+${gigDetailsBlock}
 
 }
 `

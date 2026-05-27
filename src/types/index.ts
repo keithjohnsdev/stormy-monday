@@ -32,6 +32,9 @@ export interface Artist {
   description: string
   website: string
   defaultCoverCharge: string
+  /** Musician portal login credentials — set by admin, optional */
+  email?: string
+  password?: string
 }
 
 export interface StoredShow extends Show {

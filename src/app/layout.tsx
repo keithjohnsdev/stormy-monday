@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="bg-storm-black text-storm-cream font-body antialiased">
+      <body className="bg-storm-black text-storm-cream font-body antialiased" suppressHydrationWarning>
         <Navbar />
         <main>{children}</main>
         <Footer />
