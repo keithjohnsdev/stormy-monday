@@ -153,11 +153,13 @@ function LoginForm({ onLogin }: { onLogin: (artist: SessionArtist) => void }) {
 function CalendarTab({
   artist,
   bookedDates,
+  myBookedMonths,
   gigDetails,
   onBooked,
 }: {
   artist: SessionArtist
   bookedDates: Set<string>
+  myBookedMonths: Set<string>
   gigDetails: GigDetails
   onBooked: (date: string) => void
 }) {
@@ -168,18 +170,16 @@ function CalendarTab({
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  // Two calendar months: current + next
-  const months = [
-    { year: now.getFullYear(), month: now.getMonth() },
-    {
-      year: now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear(),
-      month: now.getMonth() === 11 ? 0 : now.getMonth() + 1,
-    },
-  ]
+  // Three calendar months: current + next two (handles year rollover automatically)
+  const months = Array.from({ length: 3 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
+    return { year: d.getFullYear(), month: d.getMonth() }
+  })
 
   function handleDayClick(d: Date) {
     const ds = toDateStr(d)
-    if (!isMonOrFri(d) || ds < todayStr || bookedDates.has(ds)) return
+    const monthKey = ds.slice(0, 7)
+    if (!isMonOrFri(d) || ds < todayStr || bookedDates.has(ds) || myBookedMonths.has(monthKey)) return
     setSelected(prev => prev === ds ? null : ds)
     setBookingState('idle')
     setErrorMsg('')
@@ -210,12 +210,19 @@ function CalendarTab({
   }
 
   function renderMonth(year: number, month: number) {
+    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`
+    const artistHasBookingThisMonth = myBookedMonths.has(monthKey)
     const grid = getMonthGrid(year, month)
     return (
       <div>
-        <p className="text-storm-cream font-semibold text-center mb-4 tracking-wide">
-          {MONTH_NAMES[month]} {year}
-        </p>
+        <div className="text-center mb-4">
+          <p className="text-storm-cream font-semibold tracking-wide">
+            {MONTH_NAMES[month]} {year}
+          </p>
+          {artistHasBookingThisMonth && (
+            <p className="text-xs text-storm-gold/60 mt-0.5">· 1 show booked this month</p>
+          )}
+        </div>
         <div className="grid grid-cols-7 mb-1">
           {DAY_ABBR.map(lbl => (
             <div key={lbl} className="text-center text-xs text-storm-muted font-semibold py-1.5">{lbl}</div>
@@ -229,7 +236,8 @@ function CalendarTab({
             const available = isMonOrFri(day)
             const taken = bookedDates.has(ds)
             const isSelected = ds === selected
-            const bookable = available && !past && !taken
+            const monthLocked = available && !past && !taken && artistHasBookingThisMonth
+            const bookable = available && !past && !taken && !artistHasBookingThisMonth
 
             let cls = 'h-10 flex items-center justify-center text-sm rounded transition-colors relative select-none '
 
@@ -239,6 +247,8 @@ function CalendarTab({
               cls += 'text-storm-border cursor-default'
             } else if (taken) {
               cls += 'text-storm-muted line-through cursor-not-allowed opacity-50'
+            } else if (monthLocked) {
+              cls += 'text-storm-muted/40 cursor-not-allowed'
             } else if (isSelected) {
               cls += 'bg-storm-gold text-storm-black font-bold cursor-pointer'
             } else {
@@ -254,6 +264,7 @@ function CalendarTab({
                 className={cls}
                 title={
                   taken ? 'Already booked'
+                  : monthLocked ? 'You already have a show this month'
                   : !available ? undefined
                   : past ? 'Date passed'
                   : undefined
@@ -305,7 +316,7 @@ function CalendarTab({
       )}
 
       {/* Calendars */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {months.map(({ year, month }) => (
           <div key={`${year}-${month}`} className="bg-storm-dark border border-storm-border p-6">
             {renderMonth(year, month)}
@@ -326,6 +337,10 @@ function CalendarTab({
         <span className="flex items-center gap-2">
           <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-50 line-through text-storm-muted text-center leading-5">·</span>
           Already booked
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="w-5 h-5 border border-storm-border rounded flex-shrink-0 opacity-30" />
+          Your month is full
         </span>
       </div>
 
@@ -570,6 +585,14 @@ export default function MusicianClient({
 
   const allBookedDates = new Set([...bookedDates, ...localBookedDates])
 
+  // Months (YYYY-MM) where this artist already has a published booking
+  const myBookedMonths = new Set([
+    ...initialShows
+      .filter(s => artist && s.artistId === artist.id && s.status === 'published')
+      .map(s => s.date.slice(0, 7)),
+    ...[...localBookedDates].map(d => d.slice(0, 7)),
+  ])
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'book',    label: 'Book a Show' },
     { id: 'profile', label: 'My Info' },
@@ -634,6 +657,7 @@ export default function MusicianClient({
               <CalendarTab
                 artist={artist}
                 bookedDates={allBookedDates}
+                myBookedMonths={myBookedMonths}
                 gigDetails={gigDetails}
                 onBooked={date =>
                   setLocalBookedDates(prev => new Set([...prev, date]))

@@ -90,10 +90,22 @@ export async function POST(req: NextRequest) {
   const currentShows: StoredShow[] = file?.data ?? []
   const currentSha = file?.sha
 
-  // Check for conflicts
+  // Check for date conflict (anyone already booked this exact date)
   const conflict = currentShows.find(s => s.date === date && s.status === 'published')
   if (conflict) {
     return NextResponse.json({ error: 'That date is already booked' }, { status: 409 })
+  }
+
+  // Check for month conflict (this artist already has a show in the same month)
+  const monthKey = date.slice(0, 7) // 'YYYY-MM'
+  const monthConflict = currentShows.find(
+    s => s.artistId === artist.id && s.date.startsWith(monthKey) && s.status === 'published'
+  )
+  if (monthConflict) {
+    return NextResponse.json(
+      { error: `You already have a show booked in this month (${monthConflict.date}). One show per month per artist.` },
+      { status: 409 }
+    )
   }
 
   // Create the new show
