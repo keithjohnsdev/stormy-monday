@@ -319,10 +319,10 @@ function CalendarTab({
       {/* Booking success banner */}
       {bookingState === 'booked' && selected && (
         <div className="bg-green-900/20 border border-green-700/40 px-6 py-5">
-          <p className="text-green-400 font-semibold mb-1">You&apos;re on the calendar ✓</p>
+          <p className="text-green-400 font-semibold mb-1">Booking request submitted ✓</p>
           <p className="text-storm-muted text-sm leading-relaxed">
-            {formatFullDate(selected)} is confirmed. James will be in touch with any details.
-            The public schedule updates in about 30 seconds.
+            {formatFullDate(selected)} is pending James&apos;s approval. Once approved,
+            your show will appear on the public schedule. James will be in touch with any details.
           </p>
           <button
             onClick={() => { setSelected(null); setBookingState('idle') }}
@@ -613,7 +613,7 @@ export default function MusicianClient({
   const [bookedDates] = useState<Set<string>>(
     () => new Set(
       (initialShows as StoredShow[])
-        .filter(s => s.status === 'published')
+        .filter(s => s.status === 'published' || s.status === 'draft')
         .map(s => s.date)
     )
   )
@@ -634,10 +634,11 @@ export default function MusicianClient({
 
   const allBookedDates = new Set([...bookedDates, ...localBookedDates])
 
-  // Months (YYYY-MM) where this artist already has a published booking
+  // Months (YYYY-MM) where this artist already has a booking (draft or published)
   const myBookedMonths = new Set([
     ...initialShows
-      .filter(s => artist && s.artistId === artist.id && s.status === 'published')
+      .filter(s => artist && s.artistId === artist.id &&
+                   (s.status === 'published' || s.status === 'draft'))
       .map(s => s.date.slice(0, 7)),
     ...[...localBookedDates].map(d => d.slice(0, 7)),
   ])

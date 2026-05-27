@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/session'
 import artistsData from '@/data/artists.json'
 import bookingConfigJson from '@/data/booking-config.json'
-const bookingConfig = bookingConfigJson as { openMonths: string[] }
+const bookingConfig = bookingConfigJson as { openMonths: string[]; approvedMonths: string[] }
 import type { Artist, StoredShow } from '@/types'
 
 const SHOWS_PATH = 'src/data/shows.json'
@@ -101,15 +101,18 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Check for date conflict (anyone already booked this exact date)
-  const conflict = currentShows.find(s => s.date === date && s.status === 'published')
+  // Check for date conflict (anyone already booked this exact date — draft or published)
+  const conflict = currentShows.find(
+    s => s.date === date && (s.status === 'published' || s.status === 'draft')
+  )
   if (conflict) {
     return NextResponse.json({ error: 'That date is already booked' }, { status: 409 })
   }
 
-  // Check for month conflict (this artist already has a show in the same month)
+  // Check for month conflict (this artist already has a show in the same month — draft or published)
   const monthConflict = currentShows.find(
-    s => s.artistId === artist.id && s.date.startsWith(monthKey) && s.status === 'published'
+    s => s.artistId === artist.id && s.date.startsWith(monthKey) &&
+         (s.status === 'published' || s.status === 'draft')
   )
   if (monthConflict) {
     return NextResponse.json(
@@ -132,7 +135,7 @@ export async function POST(req: NextRequest) {
     artistWebsite: artist.website || '',
     coverCharge: artist.defaultCoverCharge || 'Free',
     featured: false,
-    status: 'published',
+    status: 'draft',
   }
 
   const updatedShows = [...currentShows, newShow].sort((a, b) =>

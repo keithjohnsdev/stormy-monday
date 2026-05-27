@@ -197,11 +197,13 @@ export default function AdminClient({
   initialArtists,
   initialShows,
   initialOpenMonths,
+  initialApprovedMonths,
 }: {
   initialData: ContentData
   initialArtists: Artist[]
   initialShows: StoredShow[]
   initialOpenMonths: string[]
+  initialApprovedMonths: string[]
 }) {
   const [password, setPassword] = useState<string | null>(null)
   const [unlockFailed, setUnlockFailed] = useState(false)
@@ -336,6 +338,7 @@ export default function AdminClient({
             <BookingCalendarTab
               shows={initialShows}
               initialOpenMonths={initialOpenMonths}
+              initialApprovedMonths={initialApprovedMonths}
               password={password ?? ''}
               isDark={isDark}
               onAuthError={() => { sessionStorage.removeItem(SESSION_KEY); setPassword(null) }}
