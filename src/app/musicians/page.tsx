@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import type { StoredShow } from '@/types'
 import showsData from '@/data/shows.json'
-import bookingConfigData from '@/data/booking-config.json'
+import bookingConfigJson from '@/data/booking-config.json'
+const bookingConfigData = bookingConfigJson as { openMonths: string[] }
 import { content } from '@/content'
 import MusicianClient from './MusicianClient'
 

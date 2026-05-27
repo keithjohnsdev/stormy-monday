@@ -1,7 +1,8 @@
 import { content } from '@/content'
 import artistsData from '@/data/artists.json'
 import showsData from '@/data/shows.json'
-import bookingConfigData from '@/data/booking-config.json'
+import bookingConfigJson from '@/data/booking-config.json'
+const bookingConfigData = bookingConfigJson as { openMonths: string[] }
 import type { Artist, StoredShow } from '@/types'
 import AdminClient from './AdminClient'
 

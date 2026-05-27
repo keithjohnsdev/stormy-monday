@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/session'
 import artistsData from '@/data/artists.json'
-import bookingConfigData from '@/data/booking-config.json'
+import bookingConfigJson from '@/data/booking-config.json'
+const bookingConfig = bookingConfigJson as { openMonths: string[] }
 import type { Artist, StoredShow } from '@/types'
 
 const SHOWS_PATH = 'src/data/shows.json'
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
 
   // Check that this month is open for musician booking
   const monthKey = date.slice(0, 7) // 'YYYY-MM'
-  if (!bookingConfigData.openMonths.includes(monthKey)) {
+  if (!bookingConfig.openMonths.includes(monthKey)) {
     return NextResponse.json(
       { error: 'That month is not currently open for booking. Contact the venue.' },
       { status: 409 }
