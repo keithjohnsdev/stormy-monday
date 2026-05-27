@@ -4,7 +4,7 @@ import { content } from '@/content'
 type ContentData = typeof content
 
 // Path inside the repo that Vercel and GitHub Actions both track
-const INDEX_TS_PATH = 'context/clients/stormy-monday/projects/website/src/content/index.ts'
+const INDEX_TS_PATH = 'src/content/index.ts'
 
 // ─── TypeScript file generator ────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/session'
 import type { Artist } from '@/types'
 
-const ARTISTS_PATH = 'context/clients/stormy-monday/projects/website/src/data/artists.json'
+const ARTISTS_PATH = 'src/data/artists.json'
 
 // ─── GitHub helpers ────────────────────────────────────────────────────────────
 

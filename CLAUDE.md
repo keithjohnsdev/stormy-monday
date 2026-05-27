@@ -84,5 +84,4 @@ npm run build                       # production build
 
 ## Client Context
 
-Full brand context, research, and project brief in the Marshall Consulting repo:
-`context/clients/stormy-monday/`
+This is a standalone repo. Brand context, research, and project briefs were previously in the Marshall Consulting monorepo — any relevant material should be ported here as needed.

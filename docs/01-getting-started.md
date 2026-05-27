@@ -12,7 +12,6 @@
 ## 1. Install dependencies
 
 ```bash
-cd context/clients/stormy-monday/projects/website
 npm install
 ```
 

@@ -3,7 +3,6 @@
 ## Local Development
 
 ```bash
-cd context/clients/stormy-monday/projects/website
 npm install
 cp .env.local.example .env.local   # then fill in your values
 npm run dev                         # http://localhost:3000
@@ -80,12 +79,9 @@ Key files to check: `src/app/layout.tsx`, any `sitemap.ts` or `robots.ts`.
 
 ### 1. Create the Vercel Project
 
-Go to [vercel.com](https://vercel.com) → New Project → Import the `keithjohnsdev/marshall-consulting` repo (or whatever the GitHub repo is named).
+Go to [vercel.com](https://vercel.com) → New Project → Import the `keithjohnsdev/stormy-monday` repo (or whatever the GitHub repo is named).
 
-**Critical setting**: Under **Build & Development Settings**, set:
-- **Root Directory**: `context/clients/stormy-monday/projects/website`
-
-If you can't find Root Directory in the wizard, skip it — the `vercel.json` at the repo root handles the build path automatically.
+No Root Directory setting needed — this is a standalone repo and Next.js is at the root.
 
 ### 2. Set Environment Variables
 
@@ -98,7 +94,7 @@ In the Vercel project → Settings → Environment Variables, add:
 | `AIRTABLE_TABLE_NAME` | `Shows` |
 | `GH_PAT` | Fine-grained GitHub PAT with Contents Read+Write on this repo |
 | `GITHUB_OWNER` | GitHub username (e.g. `keithjohnsdev`) |
-| `GITHUB_REPO` | Repo name (e.g. `marshall-consulting`) |
+| `GITHUB_REPO` | Repo name (e.g. `stormy-monday`) |
 
 ### 3. Deploy
 
@@ -123,7 +119,7 @@ Navigate to `https://your-vercel-url.vercel.app/content` — this is a hidden ad
 ## Troubleshooting
 
 **Build fails with "can't find app directory"**
-Vercel is building from the repo root instead of the website subdirectory. The `vercel.json` at the repo root should fix this automatically. If it still fails, go to Vercel → Project Settings → Build & Development Settings → set Root Directory to `context/clients/stormy-monday/projects/website`.
+Check that Vercel's Root Directory is set to `/` (the repo root). This repo is standalone — Next.js lives at the root, not in a subdirectory.
 
 **`/content` page returns 404 on deployed site**
 Usually means the build failed silently or Root Directory isn't set correctly. Check the Vercel build logs.

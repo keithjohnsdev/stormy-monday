@@ -57,7 +57,7 @@ const VALID_ENV = {
   ADMIN_PASSWORD: 'test-password',
   GH_PAT: 'ghp_fake_token',
   GITHUB_OWNER: 'keithjohnsdev',
-  GITHUB_REPO: 'marshall-consulting',
+  GITHUB_REPO: 'stormy-monday',
 }
 
 function setEnv(overrides: Partial<typeof VALID_ENV> & Record<string, string | undefined> = {}) {
@@ -182,7 +182,7 @@ describe('POST /api/save-content', () => {
     const calls = (global.fetch as jest.Mock).mock.calls
     const putCall = calls.find((c: unknown[]) => (c[1] as RequestInit)?.method === 'PUT')
     expect(putCall).toBeDefined()
-    expect(putCall[0]).toContain('github.com/repos/keithjohnsdev/marshall-consulting')
+    expect(putCall[0]).toContain('github.com/repos/keithjohnsdev/stormy-monday')
   })
 
   test('returns 500 when GitHub commit fails', async () => {

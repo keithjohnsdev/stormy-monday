@@ -3,7 +3,7 @@ import { verifySessionToken, COOKIE_NAME } from '@/lib/session'
 import artistsData from '@/data/artists.json'
 import type { Artist, StoredShow } from '@/types'
 
-const SHOWS_PATH = 'context/clients/stormy-monday/projects/website/src/data/shows.json'
+const SHOWS_PATH = 'src/data/shows.json'
 
 // ─── GitHub helpers ────────────────────────────────────────────────────────────
 

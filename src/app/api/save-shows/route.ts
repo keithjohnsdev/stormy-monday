@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const SHOWS_PATH = 'context/clients/stormy-monday/projects/website/src/data/shows.json'
+const SHOWS_PATH = 'src/data/shows.json'
 
 async function getFileSha(token: string, owner: string, repo: string, path: string): Promise<string | undefined> {
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {

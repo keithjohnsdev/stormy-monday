@@ -9,13 +9,10 @@
 ## Quick Start
 
 ```bash
-cd context/clients/stormy-monday/projects/website
 npm install
-cp .env.local.example .env.local   # then fill in Airtable keys
+cp .env.local.example .env.local   # then fill in values
 npm run dev                         # → http://localhost:3000
 ```
-
-The site runs without Airtable configured — the music schedule will show an empty state until keys are set.
 
 ---
 
