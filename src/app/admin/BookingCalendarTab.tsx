@@ -165,7 +165,7 @@ export default function BookingCalendarTab({
                 <span className={`text-xs font-medium transition-colors ${
                   isApproved ? 'text-emerald-500' : dk('text-gray-500', 'text-gray-400')
                 }`}>
-                  Approved to publish
+                  Approve/Publish
                 </span>
               </label>
             </div>
