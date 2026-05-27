@@ -139,36 +139,19 @@ export default function BookingCalendarTab({
                 </span>
               )}
             </p>
-            <div className="flex flex-col gap-1.5 items-end shrink-0">
-              {/* Open for booking */}
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isOpen}
-                  onChange={() => toggleOpen(monthKey)}
-                  className="accent-amber-500 w-4 h-4"
-                />
-                <span className={`text-xs font-medium transition-colors ${
-                  isOpen ? 'text-amber-500' : dk('text-gray-500', 'text-gray-400')
-                }`}>
-                  Open for booking
-                </span>
-              </label>
-              {/* Approved to publish */}
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isApproved}
-                  onChange={() => toggleApproved(monthKey)}
-                  className="accent-emerald-500 w-4 h-4"
-                />
-                <span className={`text-xs font-medium transition-colors ${
-                  isApproved ? 'text-emerald-500' : dk('text-gray-500', 'text-gray-400')
-                }`}>
-                  Approve/Publish
-                </span>
-              </label>
-            </div>
+          <label className="flex items-center gap-2 cursor-pointer select-none shrink-0">
+              <input
+                type="checkbox"
+                checked={isOpen}
+                onChange={() => toggleOpen(monthKey)}
+                className="accent-amber-500 w-4 h-4"
+              />
+              <span className={`text-xs font-medium transition-colors ${
+                isOpen ? 'text-amber-500' : dk('text-gray-500', 'text-gray-400')
+              }`}>
+                Open for booking
+              </span>
+            </label>
           </div>
         </div>
 
@@ -286,6 +269,26 @@ export default function BookingCalendarTab({
             </div>
           )}
 
+          {/* Approve / Unpublish button */}
+          <div className={`mt-3 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
+            <button
+              onClick={() => toggleApproved(monthKey)}
+              className={`w-full py-2 text-xs font-semibold rounded transition-colors ${
+                isApproved
+                  ? dk(
+                      'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-800/40',
+                      'bg-red-50 text-red-500 hover:bg-red-100 border border-red-200'
+                    )
+                  : dk(
+                      'bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/40 border border-emerald-800/40',
+                      'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                    )
+              }`}
+            >
+              {isApproved ? '✕ Unpublish this month' : '✓ Approve & Publish'}
+            </button>
+          </div>
+
         </div>
       </div>
     )
@@ -296,8 +299,8 @@ export default function BookingCalendarTab({
 
       {/* Description */}
       <p className={`text-sm leading-relaxed ${dk('text-gray-400', 'text-gray-600')}`}>
-        <strong className={dk('text-gray-200', 'text-gray-800')}>Open for booking</strong> — musicians can self-book through the portal.{' '}
-        <strong className={dk('text-gray-200', 'text-gray-800')}>Approved to publish</strong> — pending bookings for that month are approved and will go live when you publish.
+        <strong className={dk('text-gray-200', 'text-gray-800')}>Open for booking</strong> — musicians can self-book through the portal.
+        Use <strong className={dk('text-gray-200', 'text-gray-800')}>Approve &amp; Publish</strong> on a month to push pending bookings live. Click again to unpublish.
         Orange = pending approval · Amber = published · Green = open &amp; available.
       </p>
 
