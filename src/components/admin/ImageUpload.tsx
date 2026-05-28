@@ -6,12 +6,15 @@ interface Props {
   /** Currently stored public URL, e.g. /images/artists/xxx.jpg */
   value?: string
   folder: 'artists' | 'events'
-  password: string
+  /** Admin password — if omitted, no X-Admin-Password header is sent (musician portal uses session cookie) */
+  password?: string
+  /** Upload endpoint — defaults to /api/upload-image */
+  uploadUrl?: string
   isDark: boolean
   onChange: (url: string) => void
 }
 
-export default function ImageUpload({ value, folder, password, isDark, onChange }: Props) {
+export default function ImageUpload({ value, folder, password, uploadUrl = '/api/upload-image', isDark, onChange }: Props) {
   const [uploading,    setUploading]    = useState(false)
   const [error,        setError]        = useState('')
   const [localPreview, setLocalPreview] = useState<string | null>(null)
@@ -36,9 +39,12 @@ export default function ImageUpload({ value, folder, password, isDark, onChange 
       fd.append('file', file)
       fd.append('folder', folder)
 
-      const res = await fetch('/api/upload-image', {
+      const headers: Record<string, string> = {}
+      if (password) headers['X-Admin-Password'] = password
+
+      const res = await fetch(uploadUrl, {
         method: 'POST',
-        headers: { 'X-Admin-Password': password },
+        headers,
         body: fd,
       })
 

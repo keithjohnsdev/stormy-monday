@@ -58,7 +58,7 @@ export async function PUT(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
 
-  const { name, genre, description, website } = body as Partial<Artist>
+  const { name, genre, description, website, imageUrl } = body as Partial<Artist>
 
   const ghPat = process.env.GH_PAT
   const owner = process.env.GITHUB_OWNER
@@ -84,6 +84,7 @@ export async function PUT(req: NextRequest) {
       genre:       (genre       ?? a.genre).trim(),
       description: (description ?? a.description).trim(),
       website:     (website     ?? a.website).trim(),
+      imageUrl:    imageUrl !== undefined ? imageUrl : a.imageUrl,
     }
   })
 

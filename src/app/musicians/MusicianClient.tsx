@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { StoredShow } from '@/types'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ interface SessionArtist {
   website: string
   defaultCoverCharge: string
   email?: string
+  imageUrl?: string
 }
 
 interface GigDetails {
@@ -449,6 +451,7 @@ function ProfileTab({
     genre: artist.genre,
     description: artist.description,
     website: artist.website,
+    imageUrl: artist.imageUrl ?? '',
   })
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -472,7 +475,7 @@ function ProfileTab({
         setStatus('error')
         return
       }
-      onUpdate({ ...artist, ...form })
+      onUpdate({ ...artist, ...form, imageUrl: form.imageUrl || undefined })
       setStatus('saved')
       setTimeout(() => setStatus('idle'), 4000)
     } catch {
@@ -525,6 +528,20 @@ function ProfileTab({
           placeholder="https://..."
           className={inputCls}
         />
+      </div>
+
+      <div>
+        <label className={labelCls}>Photo</label>
+        <ImageUpload
+          value={form.imageUrl || undefined}
+          folder="artists"
+          uploadUrl="/api/musicians/upload-image"
+          isDark
+          onChange={url => setForm(f => ({ ...f, imageUrl: url }))}
+        />
+        <p className="text-xs text-storm-muted mt-2">
+          Shown on the public schedule next to your shows.
+        </p>
       </div>
 
       <div>
