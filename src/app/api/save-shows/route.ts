@@ -5,6 +5,7 @@ const SHOWS_PATH = 'src/data/shows.json'
 async function getFileSha(token: string, owner: string, repo: string, path: string): Promise<string | undefined> {
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+    cache: 'no-store',
   })
   if (!res.ok) return undefined
   return ((await res.json()) as { sha: string }).sha

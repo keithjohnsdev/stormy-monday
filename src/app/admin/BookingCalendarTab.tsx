@@ -107,7 +107,7 @@ export default function BookingCalendarTab({
     return () => document.removeEventListener('keydown', onKey)
   }, [selectedDate])
 
-  // ── Auto-save: shows + booking config ───────────────────────────────────────
+  // ── Auto-save: shows + booking config (single commit) ──────────────────────
 
   async function autoSave(
     newShows: StoredShow[] | null,
@@ -116,35 +116,23 @@ export default function BookingCalendarTab({
   ) {
     setStatus('saving')
     setErrorMsg('')
-    console.log('shows:', JSON.parse(JSON.stringify(newShows ?? localShows)))
     try {
-      if (newShows !== null) {
-        const r = await fetch('/api/save-shows', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
-          body: JSON.stringify({ shows: newShows }),
-        })
-        if (r.status === 401) { onAuthError(); return }
-        if (!r.ok) {
-          const body = await r.json().catch(() => ({}))
-          setErrorMsg((body as { error?: string }).error ?? `HTTP ${r.status}`)
-          setStatus('error')
-          return
-        }
-      }
-
-      const r2 = await fetch('/api/save-booking-config', {
+      const r = await fetch('/api/save-admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
-        body: JSON.stringify({ openMonths: [...newOpen], approvedMonths: [...newApproved] }),
+        body: JSON.stringify({
+          shows: newShows,
+          openMonths: [...newOpen],
+          approvedMonths: [...newApproved],
+        }),
       })
-      if (r2.status === 401) { onAuthError(); return }
-      if (r2.ok) {
+      if (r.status === 401) { onAuthError(); return }
+      if (r.ok) {
         setStatus('saved')
         setTimeout(() => setStatus('idle'), 4000)
       } else {
-        const body = await r2.json().catch(() => ({}))
-        setErrorMsg((body as { error?: string }).error ?? `HTTP ${r2.status}`)
+        const body = await r.json().catch(() => ({}))
+        setErrorMsg((body as { error?: string }).error ?? `HTTP ${r.status}`)
         setStatus('error')
       }
     } catch (err) {
@@ -158,7 +146,6 @@ export default function BookingCalendarTab({
   async function autoSaveEvents(newEvents: CalendarEvent[]) {
     setStatus('saving')
     setErrorMsg('')
-    console.log('events:', JSON.parse(JSON.stringify(newEvents)))
     try {
       const r = await fetch('/api/save-events', {
         method: 'POST',

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { StoredShow } from '@/types'
 
 const CONFIG_PATH = 'src/data/booking-config.json'
-const SHOWS_PATH  = 'src/data/shows.json'
 
 // ─── GitHub helpers ────────────────────────────────────────────────────────────
 
@@ -79,31 +77,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // 1. Save booking-config.json
     const configFile = await getFileContent<object>(ghPat, owner, repo, CONFIG_PATH)
     const configContent = JSON.stringify({ openMonths, approvedMonths }, null, 2) + '\n'
     await commitFile(ghPat, owner, repo, CONFIG_PATH, configContent, configFile?.sha,
       'update booking config via admin')
-
-    // 2. If any months are approved, promote their draft shows to published in shows.json
-    if (approvedMonths.length > 0) {
-      const showsFile = await getFileContent<StoredShow[]>(ghPat, owner, repo, SHOWS_PATH)
-      if (showsFile) {
-        let changed = false
-        const updated = showsFile.data.map(s => {
-          if (s.status === 'draft' && approvedMonths.includes(s.date.slice(0, 7))) {
-            changed = true
-            return { ...s, status: 'published' as const }
-          }
-          return s
-        })
-        if (changed) {
-          const showsContent = JSON.stringify(updated, null, 2) + '\n'
-          await commitFile(ghPat, owner, repo, SHOWS_PATH, showsContent, showsFile.sha,
-            'publish approved shows via admin')
-        }
-      }
-    }
   } catch (err) {
     console.error('save-booking-config: commit failed', err)
     return NextResponse.json({ error: 'Failed to commit' }, { status: 500 })
