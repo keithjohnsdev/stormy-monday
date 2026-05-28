@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "evt-1779950179623-k25es",
+    "name": "Test",
+    "date": "2026-06-04",
+    "startTime": "9pm",
+    "description": "Hmm",
+    "ticketed": true,
+    "ticketLink": "",
+    "featured": true
+  }
+]
