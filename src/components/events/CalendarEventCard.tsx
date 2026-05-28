@@ -18,7 +18,7 @@ export default function CalendarEventCard({ event }: Props) {
   const { day, date } = formatDate(event.date)
 
   return (
-    <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer">
+    <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer flex flex-col">
       <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${event.name}`} />
 
       {/* Photo / decorative header */}
@@ -46,7 +46,7 @@ export default function CalendarEventCard({ event }: Props) {
       </div>
 
       {/* Info */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-1">
         <p className="text-xs tracking-widest uppercase text-storm-gold mb-1">
           {day} · {date}
         </p>
@@ -59,7 +59,7 @@ export default function CalendarEventCard({ event }: Props) {
           </p>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-storm-border">
+        <div className="flex items-center justify-between pt-3 border-t border-storm-border mt-auto">
           <span className="text-xs text-storm-muted">{event.startTime}</span>
           {event.ticketed && event.ticketLink ? (
             <a

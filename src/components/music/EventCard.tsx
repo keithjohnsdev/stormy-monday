@@ -19,7 +19,7 @@ export default function EventCard({ show }: Props) {
   const { day, date } = formatDate(show.date)
 
   return (
-    <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer">
+    <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer flex flex-col">
       <Link href="/music" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
       {/* Artist photo */}
       <div className="aspect-[4/3] bg-storm-dark relative overflow-hidden">
@@ -43,7 +43,7 @@ export default function EventCard({ show }: Props) {
       </div>
 
       {/* Info */}
-      <div className="p-5">
+      <div className="p-5 flex flex-col flex-1">
         <p className="text-xs tracking-widest uppercase text-storm-gold mb-1">
           {day} · {date}
         </p>
@@ -59,7 +59,7 @@ export default function EventCard({ show }: Props) {
           </p>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-storm-border">
+        <div className="flex items-center justify-between pt-3 border-t border-storm-border mt-auto">
           <div className="text-xs text-storm-muted">
             {show.startTime && <span>{show.startTime}</span>}
             {show.startTime && show.coverCharge && <span className="mx-2">·</span>}
