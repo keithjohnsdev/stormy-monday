@@ -54,7 +54,7 @@ export default function UpcomingShows({ shows }: Props) {
                 {/* Decorative corner accent */}
                 <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-storm-gold/30 transition-colors duration-300 group-hover:border-storm-gold/60" />
 
-                <div className="relative p-6">
+                <div className="p-6">
                   <p className="text-xs tracking-widest uppercase text-storm-gold mb-3">
                     {formatDate(show.date)}
                   </p>
