@@ -11,7 +11,9 @@ type ContentData = typeof content
 type Status = 'idle' | 'saving' | 'saved' | 'error'
 type Tab = 'content' | 'artists' | 'shows' | 'calendar'
 
-const SESSION_KEY = 'sm_admin_pw'
+const SESSION_KEY  = 'sm_admin_pw'
+const THEME_KEY    = 'sm_admin_theme'
+const THEME_EVENT  = 'sm-theme-change'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 
@@ -219,15 +221,36 @@ export default function AdminClient({
     if (saved) setPassword(saved)
   }, [])
 
+  // Init theme from localStorage (may override hour-based default)
+  useEffect(() => {
+    const stored = localStorage.getItem(THEME_KEY)
+    if (stored !== null) {
+      setIsDark(stored === 'dark')
+      setManualOverride(true)
+    }
+  }, [])
+
+  // Listen for theme changes dispatched by Navbar toggle
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setIsDark((e as CustomEvent<boolean>).detail)
+      setManualOverride(true)
+    }
+    window.addEventListener(THEME_EVENT, handler)
+    return () => window.removeEventListener(THEME_EVENT, handler)
+  }, [])
+
   // Re-check theme every minute — skips if user has manually toggled
   useEffect(() => {
     const t = setInterval(() => { if (!manualOverride) setIsDark(isDarkHour()) }, 60_000)
     return () => clearInterval(t)
   }, [manualOverride])
 
-  function toggleTheme() {
-    setIsDark(d => !d)
+  function applyTheme(dark: boolean) {
+    setIsDark(dark)
     setManualOverride(true)
+    localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light')
+    window.dispatchEvent(new CustomEvent<boolean>(THEME_EVENT, { detail: dark }))
   }
 
   async function handleUnlock(pw: string) {
@@ -321,13 +344,8 @@ export default function AdminClient({
               ))}
             </div>
             <div className="hidden sm:block">
-              <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
+              <ThemeToggle isDark={isDark} onChange={applyTheme} />
             </div>
-          </div>
-          {/* Mobile theme toggle — below tabs, inside sticky header */}
-          <div className={`sm:hidden max-w-3xl mx-auto px-6 py-2 flex items-center gap-3 border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
-            <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Theme</span>
-            <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
           </div>
         </div>
 
