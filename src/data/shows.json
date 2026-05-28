@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "show-1779928132125",
+    "artistId": "artist-keithjohns",
+    "artistName": "Keith Johns",
+    "date": "2026-05-29",
+    "startTime": "8pm",
+    "genre": "Singer/Songwriter",
+    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
+    "ticketed": false,
+    "ticketLink": "",
+    "artistWebsite": "https://www.keithjohnsmusic.com",
+    "coverCharge": "Free",
+    "featured": true,
+    "status": "published"
+  }
+]
