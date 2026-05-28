@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext, useContext } from 'react'
 import type { content } from '@/content'
-import type { Artist, StoredShow } from '@/types'
+import type { Artist, StoredShow, CalendarEvent } from '@/types'
 import ArtistsTab from './ArtistsTab'
 import ShowsTab from './ShowsTab'
 import BookingCalendarTab from './BookingCalendarTab'
@@ -198,12 +198,14 @@ export default function AdminClient({
   initialData,
   initialArtists,
   initialShows,
+  initialEvents,
   initialOpenMonths,
   initialApprovedMonths,
 }: {
   initialData: ContentData
   initialArtists: Artist[]
   initialShows: StoredShow[]
+  initialEvents: CalendarEvent[]
   initialOpenMonths: string[]
   initialApprovedMonths: string[]
 }) {
@@ -363,6 +365,7 @@ export default function AdminClient({
             <BookingCalendarTab
               shows={initialShows}
               artists={initialArtists}
+              initialEvents={initialEvents}
               initialOpenMonths={initialOpenMonths}
               initialApprovedMonths={initialApprovedMonths}
               password={password ?? ''}

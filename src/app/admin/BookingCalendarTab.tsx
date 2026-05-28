@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Artist, StoredShow } from '@/types'
+import type { Artist, StoredShow, CalendarEvent } from '@/types'
 
 // ─── Calendar helpers ──────────────────────────────────────────────────────────
 
@@ -40,6 +40,7 @@ const DAY_ABBR = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 interface Props {
   shows: StoredShow[]
   artists: Artist[]
+  initialEvents: CalendarEvent[]
   initialOpenMonths: string[]
   initialApprovedMonths: string[]
   password: string
@@ -50,6 +51,7 @@ interface Props {
 export default function BookingCalendarTab({
   shows: initialShows,
   artists,
+  initialEvents,
   initialOpenMonths,
   initialApprovedMonths,
   password,
@@ -59,16 +61,26 @@ export default function BookingCalendarTab({
   const [openMonths,     setOpenMonths]     = useState<Set<string>>(new Set(initialOpenMonths))
   const [approvedMonths, setApprovedMonths] = useState<Set<string>>(new Set(initialApprovedMonths))
   const [localShows,     setLocalShows]     = useState<StoredShow[]>(initialShows)
+  const [localEvents,    setLocalEvents]    = useState<CalendarEvent[]>(initialEvents)
   const [status,         setStatus]         = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errorMsg,       setErrorMsg]       = useState('')
 
   // ── Modal state ─────────────────────────────────────────────────────────────
-  const [selectedDate,    setSelectedDate]    = useState<string | null>(null)
-  const [modalEditing,    setModalEditing]    = useState(false)
-  const [modalArtistId,   setModalArtistId]   = useState('')
-  const [modalTicketed,   setModalTicketed]   = useState(false)
-  const [modalFeatured,   setModalFeatured]   = useState(false)
-  const [modalTicketLink, setModalTicketLink] = useState('')
+  const [selectedDate,      setSelectedDate]      = useState<string | null>(null)
+  const [modalMode,         setModalMode]         = useState<'show' | 'event' | null>(null)
+  // Show modal fields
+  const [modalEditing,      setModalEditing]      = useState(false)
+  const [modalArtistId,     setModalArtistId]     = useState('')
+  const [modalTicketed,     setModalTicketed]     = useState(false)
+  const [modalFeatured,     setModalFeatured]     = useState(false)
+  const [modalTicketLink,   setModalTicketLink]   = useState('')
+  // Event modal fields
+  const [modalEventName,    setModalEventName]    = useState('')
+  const [modalEventTime,    setModalEventTime]    = useState('9pm')
+  const [modalEventDesc,    setModalEventDesc]    = useState('')
+  const [modalEventTicketed,    setModalEventTicketed]    = useState(false)
+  const [modalEventTicketLink,  setModalEventTicketLink]  = useState('')
+  const [modalEventFeatured,    setModalEventFeatured]    = useState(false)
 
   const now      = new Date()
   const todayStr = toDateStr(now)
@@ -81,6 +93,7 @@ export default function BookingCalendarTab({
 
   const publishedByDate = new Map(localShows.filter(s => s.status === 'published').map(s => [s.date, s]))
   const draftByDate     = new Map(localShows.filter(s => s.status === 'draft').map(s => [s.date, s]))
+  const eventByDate     = new Map(localEvents.map(e => [e.date, e]))
 
   // Escape to close modal
   useEffect(() => {
@@ -91,8 +104,7 @@ export default function BookingCalendarTab({
     return () => document.removeEventListener('keydown', onKey)
   }, [selectedDate])
 
-  // ── Auto-save ────────────────────────────────────────────────────────────────
-  // Pass null for newShows to skip the shows commit (config-only changes).
+  // ── Auto-save: shows + booking config ───────────────────────────────────────
 
   async function autoSave(
     newShows: StoredShow[] | null,
@@ -121,10 +133,7 @@ export default function BookingCalendarTab({
       const r2 = await fetch('/api/save-booking-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
-        body: JSON.stringify({
-          openMonths:     [...newOpen],
-          approvedMonths: [...newApproved],
-        }),
+        body: JSON.stringify({ openMonths: [...newOpen], approvedMonths: [...newApproved] }),
       })
       if (r2.status === 401) { onAuthError(); return }
       if (r2.ok) {
@@ -141,26 +150,70 @@ export default function BookingCalendarTab({
     }
   }
 
-  // ── Modal actions ────────────────────────────────────────────────────────────
+  // ── Auto-save: events ───────────────────────────────────────────────────────
+
+  async function autoSaveEvents(newEvents: CalendarEvent[]) {
+    setStatus('saving')
+    setErrorMsg('')
+    console.log('events:', JSON.parse(JSON.stringify(newEvents)))
+    try {
+      const r = await fetch('/api/save-events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+        body: JSON.stringify({ events: newEvents }),
+      })
+      if (r.status === 401) { onAuthError(); return }
+      if (r.ok) {
+        setStatus('saved')
+        setTimeout(() => setStatus('idle'), 4000)
+      } else {
+        const body = await r.json().catch(() => ({}))
+        setErrorMsg((body as { error?: string }).error ?? `HTTP ${r.status}`)
+        setStatus('error')
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Network error')
+      setStatus('error')
+    }
+  }
+
+  // ── Modal open / close ───────────────────────────────────────────────────────
 
   function openModal(dateStr: string) {
-    const show = publishedByDate.get(dateStr) ?? draftByDate.get(dateStr)
+    const d = new Date(dateStr + 'T00:00:00')
     setSelectedDate(dateStr)
-    setModalEditing(false)
-    setModalArtistId(show?.artistId ?? artists[0]?.id ?? '')
-    setModalTicketed(false)
-    setModalFeatured(false)
-    setModalTicketLink('')
+
+    if (isMonOrFri(d)) {
+      // Show modal
+      const show = publishedByDate.get(dateStr) ?? draftByDate.get(dateStr)
+      setModalMode('show')
+      setModalEditing(false)
+      setModalArtistId(show?.artistId ?? artists[0]?.id ?? '')
+      setModalTicketed(false); setModalFeatured(false); setModalTicketLink('')
+    } else {
+      // Event modal
+      const event = eventByDate.get(dateStr)
+      setModalMode('event')
+      setModalEventName(event?.name ?? '')
+      setModalEventTime(event?.startTime ?? '9pm')
+      setModalEventDesc(event?.description ?? '')
+      setModalEventTicketed(event?.ticketed ?? false)
+      setModalEventTicketLink(event?.ticketLink ?? '')
+      setModalEventFeatured(event?.featured ?? false)
+    }
   }
 
   function closeModal() {
     setSelectedDate(null)
+    setModalMode(null)
     setModalEditing(false)
     setModalArtistId('')
-    setModalTicketed(false)
-    setModalFeatured(false)
-    setModalTicketLink('')
+    setModalTicketed(false); setModalFeatured(false); setModalTicketLink('')
+    setModalEventName(''); setModalEventTime('9pm'); setModalEventDesc('')
+    setModalEventTicketed(false); setModalEventTicketLink(''); setModalEventFeatured(false)
   }
+
+  // ── Show modal actions ───────────────────────────────────────────────────────
 
   async function approveShow() {
     if (!selectedDate) return
@@ -183,10 +236,8 @@ export default function BookingCalendarTab({
     const newShows = localShows.map(s =>
       s.id !== show.id ? s : {
         ...s,
-        artistId:      artist.id,
-        artistName:    artist.name,
-        genre:         artist.genre,
-        description:   artist.description,
+        artistId: artist.id, artistName: artist.name,
+        genre: artist.genre, description: artist.description,
         artistWebsite: artist.website || '',
       }
     )
@@ -229,6 +280,56 @@ export default function BookingCalendarTab({
     await autoSave(newShows, openMonths, approvedMonths)
   }
 
+  // ── Event modal actions ──────────────────────────────────────────────────────
+
+  async function saveEvent() {
+    if (!selectedDate || !modalEventName.trim()) return
+    const existing = eventByDate.get(selectedDate)
+
+    let newEvents: CalendarEvent[]
+    if (existing) {
+      // Update existing
+      newEvents = localEvents.map(e =>
+        e.id !== existing.id ? e : {
+          ...e,
+          name:       modalEventName.trim(),
+          startTime:  modalEventTime.trim() || '9pm',
+          description: modalEventDesc.trim() || undefined,
+          ticketed:   modalEventTicketed,
+          ticketLink: modalEventTicketed ? modalEventTicketLink.trim() : '',
+          featured:   modalEventFeatured,
+        }
+      )
+    } else {
+      // Create new
+      const newEvent: CalendarEvent = {
+        id:          `evt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name:        modalEventName.trim(),
+        date:        selectedDate,
+        startTime:   modalEventTime.trim() || '9pm',
+        description: modalEventDesc.trim() || undefined,
+        ticketed:    modalEventTicketed,
+        ticketLink:  modalEventTicketed ? modalEventTicketLink.trim() : '',
+        featured:    modalEventFeatured,
+      }
+      newEvents = [...localEvents, newEvent].sort((a, b) => a.date.localeCompare(b.date))
+    }
+
+    setLocalEvents(newEvents)
+    closeModal()
+    await autoSaveEvents(newEvents)
+  }
+
+  async function removeEvent() {
+    if (!selectedDate) return
+    const existing = eventByDate.get(selectedDate)
+    if (!existing) return
+    const newEvents = localEvents.filter(e => e.id !== existing.id)
+    setLocalEvents(newEvents)
+    closeModal()
+    await autoSaveEvents(newEvents)
+  }
+
   // ── Calendar card actions ────────────────────────────────────────────────────
 
   async function toggleOpen(monthKey: string) {
@@ -264,10 +365,6 @@ export default function BookingCalendarTab({
   }
 
   // ── Month card renderer ──────────────────────────────────────────────────────
-
-  const selectCls = `text-xs border rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
-    dk('bg-gray-700 border-gray-600 text-gray-100', 'bg-white border-gray-300 text-gray-800')
-  }`
 
   function renderMonth(year: number, month: number) {
     const monthKey        = `${year}-${String(month + 1).padStart(2, '0')}`
@@ -321,39 +418,58 @@ export default function BookingCalendarTab({
           <div className="grid grid-cols-7 gap-y-0.5">
             {grid.map((day, i) => {
               if (!day) return <div key={i} className="h-8" />
-              const ds        = toDateStr(day)
-              const past      = ds < todayStr
-              const monOrFri  = isMonOrFri(day)
-              const published = publishedByDate.get(ds)
-              const draft     = draftByDate.get(ds)
-              const show      = published ?? draft
+              const ds         = toDateStr(day)
+              const past       = ds < todayStr
+              const mf         = isMonOrFri(day)
+              const published  = publishedByDate.get(ds)
+              const draft      = draftByDate.get(ds)
+              const show       = published ?? draft
               const isPending  = !published && !!draft
-              const isOpenDate = monOrFri && !past && !show
-              const clickable  = !!show || isOpenDate
+              const event      = !mf ? eventByDate.get(ds) : undefined
+              const isEventDay = !!event
+              // all future dates are clickable (show-or-event logic in openModal)
+              const clickable  = past ? (!!show || isEventDay) : true
 
               let cls = 'h-8 flex items-center justify-center text-xs rounded relative '
               if (clickable) cls += 'cursor-pointer '
 
-              if (!monOrFri) {
-                cls += dk('text-gray-700', 'text-gray-300')
-              } else if (isPending) {
-                cls += past
-                  ? dk('text-amber-900 bg-amber-900/10', 'text-amber-700 bg-amber-50')
-                  : 'bg-amber-900/20 text-amber-300 font-bold ring-1 ring-amber-500/40'
-                if (clickable) cls += ' hover:ring-2 hover:ring-amber-400/60'
-              } else if (published && past) {
-                cls += dk('text-emerald-800 bg-emerald-900/20', 'text-emerald-700 bg-emerald-50')
-                if (clickable) cls += dk(' hover:ring-2 hover:ring-emerald-600/60', ' hover:ring-2 hover:ring-emerald-400/60')
-              } else if (published) {
-                cls += 'bg-emerald-500/20 text-emerald-400 font-bold ring-1 ring-emerald-500/40'
-                if (clickable) cls += ' hover:ring-2 hover:ring-emerald-400/80'
-              } else if (past) {
-                cls += dk('text-gray-600', 'text-gray-400')
+              if (mf) {
+                // Mon/Fri: existing show colours
+                if (isPending) {
+                  cls += past
+                    ? dk('text-amber-900 bg-amber-900/10', 'text-amber-700 bg-amber-50')
+                    : 'bg-amber-900/20 text-amber-300 font-bold ring-1 ring-amber-500/40'
+                  if (!past) cls += ' hover:ring-2 hover:ring-amber-400/60'
+                } else if (published && past) {
+                  cls += dk('text-emerald-800 bg-emerald-900/20', 'text-emerald-700 bg-emerald-50')
+                  cls += dk(' hover:ring-2 hover:ring-emerald-600/60', ' hover:ring-2 hover:ring-emerald-400/60')
+                } else if (published) {
+                  cls += 'bg-emerald-500/20 text-emerald-400 font-bold ring-1 ring-emerald-500/40'
+                  cls += ' hover:ring-2 hover:ring-emerald-400/80'
+                } else if (past) {
+                  cls += dk('text-gray-600', 'text-gray-400')
+                } else {
+                  // open Mon/Fri
+                  cls += dk(
+                    'bg-gray-700/30 text-gray-400 font-semibold ring-1 ring-gray-600/40 hover:ring-gray-500/60 hover:text-gray-300',
+                    'bg-gray-100 text-gray-500 font-semibold ring-1 ring-gray-300 hover:ring-gray-400 hover:text-gray-700'
+                  )
+                }
               } else {
-                cls += dk(
-                  'bg-gray-700/30 text-gray-400 font-semibold ring-1 ring-gray-600/40 hover:ring-gray-500/60 hover:text-gray-300',
-                  'bg-gray-100 text-gray-500 font-semibold ring-1 ring-gray-300 hover:ring-gray-400 hover:text-gray-700'
-                )
+                // Non-Mon/Fri
+                if (isEventDay && !past) {
+                  cls += 'bg-violet-900/20 text-violet-300 font-bold ring-1 ring-violet-500/40 hover:ring-2 hover:ring-violet-400/60'
+                } else if (isEventDay && past) {
+                  cls += dk('text-violet-900 bg-violet-900/10 hover:ring-1 hover:ring-violet-700/40', 'text-violet-600 bg-violet-50 hover:ring-1 hover:ring-violet-300')
+                } else if (!past) {
+                  // future empty non-Mon/Fri: subtle hover border per user request
+                  cls += dk(
+                    'text-gray-700 hover:ring-1 hover:ring-gray-600/50 hover:text-gray-400',
+                    'text-gray-300 hover:ring-1 hover:ring-gray-400/50 hover:text-gray-500'
+                  )
+                } else {
+                  cls += dk('text-gray-700', 'text-gray-300')
+                }
               }
 
               return (
@@ -362,9 +478,10 @@ export default function BookingCalendarTab({
                   className={cls}
                   onClick={clickable ? () => openModal(ds) : undefined}
                   title={
-                    isPending    ? `Pending: ${draft!.artistName} — click to edit`
-                    : show       ? `${show.artistName} — click to edit`
-                    : isOpenDate ? 'Open — click to book'
+                    isPending   ? `Pending: ${draft!.artistName} — click to edit`
+                    : show      ? `${show.artistName} — click to edit`
+                    : isEventDay ? `${event!.name} — click to edit`
+                    : !past     ? 'Click to add event or show'
                     : undefined
                   }
                 >
@@ -374,12 +491,15 @@ export default function BookingCalendarTab({
                       ? <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-amber-400" />
                       : <span className="absolute top-0 right-0.5 text-[9px] leading-none font-bold text-emerald-400">✓</span>
                   )}
+                  {isEventDay && !show && (
+                    <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-violet-400" />
+                  )}
                 </div>
               )
             })}
           </div>
 
-          {/* Approve All / Unpublish */}
+          {/* Approve All / Unapprove All */}
           <div className={`mt-4 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
             {!isApproved ? (
               <button
@@ -415,10 +535,17 @@ export default function BookingCalendarTab({
     )
   }
 
-  // ── Modal ───────────────────────────────────────────────────────────────────
+  // ── Derived modal state ──────────────────────────────────────────────────────
 
-  const modalShow       = selectedDate ? (publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate) ?? null) : null
-  const isPendingModal  = modalShow?.status === 'draft'
+  const modalShow      = selectedDate ? (publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate) ?? null) : null
+  const modalEvent     = selectedDate ? (eventByDate.get(selectedDate) ?? null) : null
+  const isPendingModal = modalShow?.status === 'draft'
+
+  // ── Shared input classes ─────────────────────────────────────────────────────
+
+  const inputCls = `w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+    dk('bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500', 'bg-white border-gray-300 text-gray-800 placeholder:text-gray-400')
+  }`
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -437,16 +564,15 @@ export default function BookingCalendarTab({
             Pending approval
           </span>
           <span className="flex items-center gap-1.5">
+            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-violet-900/20 ring-violet-500/40', 'bg-violet-50 ring-violet-200')}`} />
+            Special event
+          </span>
+          <span className="flex items-center gap-1.5">
             <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-gray-700/30 ring-gray-600/40', 'bg-gray-100 ring-gray-300')}`} />
             Open Mon / Fri
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className={`w-5 h-5 rounded flex-shrink-0 ${dk('bg-gray-700/50', 'bg-gray-100')}`} />
-            Not a booking day
-          </span>
         </div>
 
-        {/* Auto-save status */}
         {status !== 'idle' && (
           <span className={`text-xs shrink-0 ${
             status === 'saving' ? dk('text-gray-400', 'text-gray-500') :
@@ -469,8 +595,8 @@ export default function BookingCalendarTab({
         ))}
       </div>
 
-      {/* Date detail modal */}
-      {selectedDate && (
+      {/* ── Modal ────────────────────────────────────────────────────────────── */}
+      {selectedDate && modalMode && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4"
           onClick={e => { if (e.target === e.currentTarget) closeModal() }}
@@ -487,187 +613,143 @@ export default function BookingCalendarTab({
               className={`absolute top-4 right-4 text-lg leading-none transition-colors ${
                 dk('text-gray-600 hover:text-gray-300', 'text-gray-400 hover:text-gray-700')
               }`}
-            >
-              ×
-            </button>
+            >×</button>
 
             {/* Date heading */}
             <div>
               <p className={`text-xs uppercase tracking-widest mb-1.5 ${
-                !modalShow ? dk('text-gray-400', 'text-gray-500')
-                : isPendingModal ? 'text-amber-400'
-                : 'text-emerald-500'
+                modalMode === 'event'
+                  ? (modalEvent ? 'text-violet-400' : dk('text-gray-400', 'text-gray-500'))
+                  : (!modalShow ? dk('text-gray-400', 'text-gray-500') : isPendingModal ? 'text-amber-400' : 'text-emerald-500')
               }`}>
-                {!modalShow ? 'Open Date' : isPendingModal ? 'Pending Approval' : 'Published'}
+                {modalMode === 'event'
+                  ? (modalEvent ? 'Special Event' : 'Open Date')
+                  : (!modalShow ? 'Open Date' : isPendingModal ? 'Pending Approval' : 'Published')}
               </p>
               <p className={`font-semibold text-base ${dk('text-gray-100', 'text-gray-900')}`}>
                 {formatAdminDate(selectedDate)}
               </p>
             </div>
 
-            {/* ── ADD MODE (no existing show) ── */}
-            {!modalShow && (
-              <div className="grid gap-3">
-                <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>
-                  Select musician
-                </p>
-                <select
-                  value={modalArtistId}
-                  onChange={e => setModalArtistId(e.target.value)}
-                  className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-                    dk('bg-gray-800 border-gray-600 text-gray-100', 'bg-white border-gray-300 text-gray-800')
-                  }`}
-                >
-                  {artists.map(a => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
-                </select>
-                <div className="flex items-center gap-5">
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={modalFeatured}
-                      onChange={e => setModalFeatured(e.target.checked)}
-                      className="accent-amber-500 w-4 h-4"
-                    />
-                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Featured</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={modalTicketed}
-                      onChange={e => { setModalTicketed(e.target.checked); if (!e.target.checked) setModalTicketLink('') }}
-                      className="accent-amber-500 w-4 h-4"
-                    />
-                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Ticketed</span>
-                  </label>
-                </div>
-                {modalTicketed && (
-                  <input
-                    type="url"
-                    placeholder="Ticket URL"
-                    value={modalTicketLink}
-                    onChange={e => setModalTicketLink(e.target.value)}
-                    className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-                      dk('bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500', 'bg-white border-gray-300 text-gray-800 placeholder:text-gray-400')
-                    }`}
-                  />
-                )}
-                <div className="flex gap-2">
-                  <button
-                    onClick={addShow}
-                    disabled={status === 'saving' || !modalArtistId}
-                    className="flex-1 py-2.5 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
-                  >
-                    {status === 'saving' ? 'Booking…' : 'Book Show'}
-                  </button>
-                  <button
-                    onClick={closeModal}
-                    className={`flex-1 py-2.5 text-sm rounded border transition-colors ${
-                      dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')
-                    }`}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* ── VIEW / EDIT MODE (existing show) ── */}
-            {modalShow && (
+            {/* ══ SHOW MODAL ══ */}
+            {modalMode === 'show' && (
               <>
-                {/* Artist info or edit dropdown */}
-                {!modalEditing ? (
-                  <div className={`border rounded-md p-4 ${dk('border-gray-700 bg-gray-800/50', 'border-gray-200 bg-gray-50')}`}>
-                    <p className={`font-semibold text-sm mb-0.5 ${dk('text-gray-100', 'text-gray-900')}`}>
-                      {modalShow.artistName}
-                    </p>
-                    {modalShow.genre && (
-                      <p className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>{modalShow.genre}</p>
-                    )}
-                  </div>
-                ) : (
+                {!modalShow ? (
+                  /* Add show */
                   <div className="grid gap-3">
-                    <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>
-                      Change musician
-                    </p>
-                    <select
-                      value={modalArtistId}
-                      onChange={e => setModalArtistId(e.target.value)}
-                      className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-                        dk('bg-gray-800 border-gray-600 text-gray-100', 'bg-white border-gray-300 text-gray-800')
-                      }`}
-                    >
-                      {artists.map(a => (
-                        <option key={a.id} value={a.id}>{a.name}</option>
-                      ))}
+                    <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>Select musician</p>
+                    <select value={modalArtistId} onChange={e => setModalArtistId(e.target.value)} className={inputCls}>
+                      {artists.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                     </select>
+                    <div className="flex items-center gap-5">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" checked={modalFeatured} onChange={e => setModalFeatured(e.target.checked)} className="accent-amber-500 w-4 h-4" />
+                        <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Featured</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" checked={modalTicketed} onChange={e => { setModalTicketed(e.target.checked); if (!e.target.checked) setModalTicketLink('') }} className="accent-amber-500 w-4 h-4" />
+                        <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Ticketed</span>
+                      </label>
+                    </div>
+                    {modalTicketed && (
+                      <input type="url" placeholder="Ticket URL" value={modalTicketLink} onChange={e => setModalTicketLink(e.target.value)} className={inputCls} />
+                    )}
                     <div className="flex gap-2">
-                      <button
-                        onClick={confirmModalEdit}
-                        disabled={status === 'saving'}
-                        className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
-                      >
-                        {status === 'saving' ? 'Saving…' : 'Save Change'}
+                      <button onClick={addShow} disabled={status === 'saving' || !modalArtistId} className="flex-1 py-2.5 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors">
+                        {status === 'saving' ? 'Booking…' : 'Book Show'}
                       </button>
-                      <button
-                        onClick={() => setModalEditing(false)}
-                        className={`flex-1 py-2 text-sm rounded border transition-colors ${
-                          dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')
-                        }`}
-                      >
+                      <button onClick={closeModal} className={`flex-1 py-2.5 text-sm rounded border transition-colors ${dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')}`}>
                         Cancel
                       </button>
                     </div>
                   </div>
-                )}
-
-                {/* Actions */}
-                {!modalEditing && (
-                  <div className="grid gap-2 pt-1">
-                    {isPendingModal && (
-                      <button
-                        onClick={approveShow}
-                        disabled={status === 'saving'}
-                        className={`w-full py-2.5 text-sm font-semibold rounded border transition-colors disabled:opacity-50 ${
-                          dk(
-                            'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/40',
-                            'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                          )
-                        }`}
-                      >
-                        {status === 'saving' ? 'Approving…' : '✓ Approve'}
-                      </button>
-                    )}
+                ) : !modalEditing ? (
+                  /* View show */
+                  <>
+                    <div className={`border rounded-md p-4 ${dk('border-gray-700 bg-gray-800/50', 'border-gray-200 bg-gray-50')}`}>
+                      <p className={`font-semibold text-sm mb-0.5 ${dk('text-gray-100', 'text-gray-900')}`}>{modalShow.artistName}</p>
+                      {modalShow.genre && <p className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>{modalShow.genre}</p>}
+                    </div>
+                    <div className="grid gap-2 pt-1">
+                      {isPendingModal && (
+                        <button onClick={approveShow} disabled={status === 'saving'} className={`w-full py-2.5 text-sm font-semibold rounded border transition-colors disabled:opacity-50 ${dk('bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/40', 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100')}`}>
+                          {status === 'saving' ? 'Approving…' : '✓ Approve'}
+                        </button>
+                      )}
+                      <div className="flex gap-2">
+                        <button onClick={() => setModalEditing(true)} className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${dk('border-gray-600 text-gray-300 hover:text-white hover:border-gray-400', 'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500')}`}>
+                          Edit Musician
+                        </button>
+                        <button onClick={removeModalShow} disabled={status === 'saving'} className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${dk('border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700', 'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300')}`}>
+                          Remove Show
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  /* Edit show */
+                  <div className="grid gap-3">
+                    <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>Change musician</p>
+                    <select value={modalArtistId} onChange={e => setModalArtistId(e.target.value)} className={inputCls}>
+                      {artists.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                    </select>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => setModalEditing(true)}
-                        className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
-                          dk(
-                            'border-gray-600 text-gray-300 hover:text-white hover:border-gray-400',
-                            'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500'
-                          )
-                        }`}
-                      >
-                        Edit Musician
+                      <button onClick={confirmModalEdit} disabled={status === 'saving'} className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors">
+                        {status === 'saving' ? 'Saving…' : 'Save Change'}
                       </button>
-                      <button
-                        onClick={removeModalShow}
-                        disabled={status === 'saving'}
-                        className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${
-                          dk(
-                            'border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700',
-                            'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300'
-                          )
-                        }`}
-                      >
-                        Remove Show
+                      <button onClick={() => setModalEditing(false)} className={`flex-1 py-2 text-sm rounded border transition-colors ${dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')}`}>
+                        Cancel
                       </button>
                     </div>
                   </div>
                 )}
               </>
             )}
+
+            {/* ══ EVENT MODAL ══ */}
+            {modalMode === 'event' && (
+              <div className="grid gap-3">
+                <div>
+                  <label className={`text-xs uppercase tracking-widest block mb-1.5 ${dk('text-gray-400', 'text-gray-500')}`}>Event Name</label>
+                  <input type="text" placeholder="e.g. Jazz Brunch, NYE Gala…" value={modalEventName} onChange={e => setModalEventName(e.target.value)} className={inputCls} autoFocus />
+                </div>
+                <div>
+                  <label className={`text-xs uppercase tracking-widest block mb-1.5 ${dk('text-gray-400', 'text-gray-500')}`}>Time</label>
+                  <input type="text" placeholder="9pm" value={modalEventTime} onChange={e => setModalEventTime(e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className={`text-xs uppercase tracking-widest block mb-1.5 ${dk('text-gray-400', 'text-gray-500')}`}>Description <span className={dk('text-gray-600', 'text-gray-400')}>(optional)</span></label>
+                  <textarea rows={2} placeholder="Short description…" value={modalEventDesc} onChange={e => setModalEventDesc(e.target.value)} className={`${inputCls} resize-none`} />
+                </div>
+                <div className="flex items-center gap-5">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" checked={modalEventFeatured} onChange={e => setModalEventFeatured(e.target.checked)} className="accent-amber-500 w-4 h-4" />
+                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Featured</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" checked={modalEventTicketed} onChange={e => { setModalEventTicketed(e.target.checked); if (!e.target.checked) setModalEventTicketLink('') }} className="accent-amber-500 w-4 h-4" />
+                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Ticketed</span>
+                  </label>
+                </div>
+                {modalEventTicketed && (
+                  <input type="url" placeholder="Ticket URL" value={modalEventTicketLink} onChange={e => setModalEventTicketLink(e.target.value)} className={inputCls} />
+                )}
+                <div className="flex gap-2 pt-1">
+                  <button onClick={saveEvent} disabled={status === 'saving' || !modalEventName.trim()} className="flex-1 py-2.5 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors">
+                    {status === 'saving' ? 'Saving…' : (modalEvent ? 'Save Changes' : 'Create Event')}
+                  </button>
+                  {modalEvent && (
+                    <button onClick={removeEvent} disabled={status === 'saving'} className={`py-2.5 px-4 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${dk('border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700', 'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300')}`}>
+                      Remove
+                    </button>
+                  )}
+                  <button onClick={closeModal} className={`flex-1 py-2.5 text-sm rounded border transition-colors ${dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')}`}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}

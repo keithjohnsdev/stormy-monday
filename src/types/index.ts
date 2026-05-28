@@ -27,6 +27,17 @@ export interface TeamMember {
   imagePlaceholder?: string
 }
 
+export interface CalendarEvent {
+  id: string
+  name: string
+  date: string          // ISO: "2026-07-04"
+  startTime: string     // e.g. "7pm"
+  description?: string
+  ticketed?: boolean
+  ticketLink?: string
+  featured?: boolean
+}
+
 export interface Artist {
   id: string
   name: string
