@@ -259,7 +259,7 @@ export default function BookingCalendarTab({
           {/* Calendar grid */}
           <div className="grid grid-cols-7 gap-y-0.5">
             {grid.map((day, i) => {
-              if (!day) return <div key={i} />
+              if (!day) return <div key={i} className="h-8" />
               const ds        = toDateStr(day)
               const past      = ds < todayStr
               const monOrFri  = isMonOrFri(day)
