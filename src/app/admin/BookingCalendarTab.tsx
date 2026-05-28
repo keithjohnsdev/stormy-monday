@@ -19,7 +19,7 @@ function getMonthGrid(year: number, month: number): Array<Date | null> {
   const grid: Array<Date | null> = []
   for (let i = 0; i < first.getDay(); i++) grid.push(null)
   for (let d = 1; d <= last.getDate(); d++) grid.push(new Date(year, month, d))
-  while (grid.length < 42) grid.push(null) // always 6 rows → consistent card height
+  while (grid.length < 42) grid.push(null)
   return grid
 }
 
@@ -59,26 +59,23 @@ export default function BookingCalendarTab({
   const [openMonths,     setOpenMonths]     = useState<Set<string>>(new Set(initialOpenMonths))
   const [approvedMonths, setApprovedMonths] = useState<Set<string>>(new Set(initialApprovedMonths))
   const [localShows,     setLocalShows]     = useState<StoredShow[]>(initialShows)
-  const [showsDirty,     setShowsDirty]     = useState(false)
   const [status,         setStatus]         = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errorMsg,       setErrorMsg]       = useState('')
 
   // ── Modal state ─────────────────────────────────────────────────────────────
-  const [selectedDate,    setSelectedDate]    = useState<string | null>(null)
-  const [modalEditing,    setModalEditing]    = useState(false)
-  const [modalArtistId,   setModalArtistId]   = useState('')
+  const [selectedDate,  setSelectedDate]  = useState<string | null>(null)
+  const [modalEditing,  setModalEditing]  = useState(false)
+  const [modalArtistId, setModalArtistId] = useState('')
 
   const now      = new Date()
   const todayStr = toDateStr(now)
   const dk = (dark: string, light: string) => isDark ? dark : light
 
-  // Six months: current + next 5
   const months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
     return { year: d.getFullYear(), month: d.getMonth() }
   })
 
-  // Derive display maps from local (mutable) shows
   const publishedByDate = new Map(localShows.filter(s => s.status === 'published').map(s => [s.date, s]))
   const draftByDate     = new Map(localShows.filter(s => s.status === 'draft').map(s => [s.date, s]))
 
@@ -90,6 +87,55 @@ export default function BookingCalendarTab({
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [selectedDate])
+
+  // ── Auto-save ────────────────────────────────────────────────────────────────
+  // Pass null for newShows to skip the shows commit (config-only changes).
+
+  async function autoSave(
+    newShows: StoredShow[] | null,
+    newOpen: Set<string>,
+    newApproved: Set<string>,
+  ) {
+    setStatus('saving')
+    setErrorMsg('')
+    try {
+      if (newShows !== null) {
+        const r = await fetch('/api/save-shows', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+          body: JSON.stringify({ shows: newShows }),
+        })
+        if (r.status === 401) { onAuthError(); return }
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}))
+          setErrorMsg((body as { error?: string }).error ?? `HTTP ${r.status}`)
+          setStatus('error')
+          return
+        }
+      }
+
+      const r2 = await fetch('/api/save-booking-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+        body: JSON.stringify({
+          openMonths:     [...newOpen],
+          approvedMonths: [...newApproved],
+        }),
+      })
+      if (r2.status === 401) { onAuthError(); return }
+      if (r2.ok) {
+        setStatus('saved')
+        setTimeout(() => setStatus('idle'), 4000)
+      } else {
+        const body = await r2.json().catch(() => ({}))
+        setErrorMsg((body as { error?: string }).error ?? `HTTP ${r2.status}`)
+        setStatus('error')
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Network error')
+      setStatus('error')
+    }
+  }
 
   // ── Modal actions ────────────────────────────────────────────────────────────
 
@@ -107,13 +153,25 @@ export default function BookingCalendarTab({
     setModalArtistId('')
   }
 
-  function confirmModalEdit() {
+  async function approveShow() {
+    if (!selectedDate) return
+    const show = publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate)
+    if (!show) return
+    const newShows = localShows.map(s =>
+      s.id !== show.id ? s : { ...s, status: 'published' as const }
+    )
+    setLocalShows(newShows)
+    closeModal()
+    await autoSave(newShows, openMonths, approvedMonths)
+  }
+
+  async function confirmModalEdit() {
     if (!selectedDate) return
     const show = publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate)
     if (!show) return
     const artist = artists.find(a => a.id === modalArtistId)
     if (!artist) return
-    setLocalShows(prev => prev.map(s =>
+    const newShows = localShows.map(s =>
       s.id !== show.id ? s : {
         ...s,
         artistId:      artist.id,
@@ -122,83 +180,48 @@ export default function BookingCalendarTab({
         description:   artist.description,
         artistWebsite: artist.website || '',
       }
-    ))
-    setShowsDirty(true)
+    )
+    setLocalShows(newShows)
     setModalEditing(false)
+    await autoSave(newShows, openMonths, approvedMonths)
   }
 
-  function removeModalShow() {
+  async function removeModalShow() {
     if (!selectedDate) return
     const show = publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate)
     if (!show) return
-    setLocalShows(prev => prev.filter(s => s.id !== show.id))
-    setShowsDirty(true)
+    const newShows = localShows.filter(s => s.id !== show.id)
+    setLocalShows(newShows)
     closeModal()
+    await autoSave(newShows, openMonths, approvedMonths)
   }
 
-  // ── Booking-config toggles ───────────────────────────────────────────────────
+  // ── Calendar card actions ────────────────────────────────────────────────────
 
-  function toggleOpen(monthKey: string) {
-    setOpenMonths(prev => {
-      const next = new Set(prev)
-      next.has(monthKey) ? next.delete(monthKey) : next.add(monthKey)
-      return next
-    })
-    setStatus('idle')
+  async function toggleOpen(monthKey: string) {
+    const newOpen = new Set(openMonths)
+    newOpen.has(monthKey) ? newOpen.delete(monthKey) : newOpen.add(monthKey)
+    setOpenMonths(newOpen)
+    await autoSave(null, newOpen, approvedMonths)
   }
 
-  function toggleApproved(monthKey: string) {
-    setApprovedMonths(prev => {
-      const next = new Set(prev)
-      next.has(monthKey) ? next.delete(monthKey) : next.add(monthKey)
-      return next
-    })
-    setStatus('idle')
+  async function approveAllInMonth(monthKey: string) {
+    const newShows = localShows.map(s =>
+      s.date.startsWith(monthKey) && s.status === 'draft'
+        ? { ...s, status: 'published' as const }
+        : s
+    )
+    const newApproved = new Set([...approvedMonths, monthKey])
+    setLocalShows(newShows)
+    setApprovedMonths(newApproved)
+    await autoSave(newShows, openMonths, newApproved)
   }
 
-  // ── Save ────────────────────────────────────────────────────────────────────
-
-  async function save() {
-    setStatus('saving')
-    setErrorMsg('')
-    try {
-      if (showsDirty) {
-        const showsRes = await fetch('/api/save-shows', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
-          body: JSON.stringify({ shows: localShows }),
-        })
-        if (showsRes.status === 401) { onAuthError(); return }
-        if (!showsRes.ok) {
-          const body = await showsRes.json().catch(() => ({}))
-          setErrorMsg((body as { error?: string }).error ?? `HTTP ${showsRes.status}`)
-          setStatus('error')
-          return
-        }
-        setShowsDirty(false)
-      }
-
-      const res = await fetch('/api/save-booking-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
-        body: JSON.stringify({
-          openMonths:     [...openMonths],
-          approvedMonths: [...approvedMonths],
-        }),
-      })
-      if (res.status === 401) { onAuthError(); return }
-      if (res.ok) {
-        setStatus('saved')
-        setTimeout(() => setStatus('idle'), 5000)
-      } else {
-        const body = await res.json().catch(() => ({}))
-        setErrorMsg((body as { error?: string }).error ?? `HTTP ${res.status}`)
-        setStatus('error')
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Network error')
-      setStatus('error')
-    }
+  async function unpublishMonth(monthKey: string) {
+    const newApproved = new Set(approvedMonths)
+    newApproved.delete(monthKey)
+    setApprovedMonths(newApproved)
+    await autoSave(null, openMonths, newApproved)
   }
 
   // ── Month card renderer ──────────────────────────────────────────────────────
@@ -208,11 +231,10 @@ export default function BookingCalendarTab({
   }`
 
   function renderMonth(year: number, month: number) {
-    const monthKey   = `${year}-${String(month + 1).padStart(2, '0')}`
-    const isOpen     = openMonths.has(monthKey)
-    const isApproved = approvedMonths.has(monthKey)
-    const grid       = getMonthGrid(year, month)
-
+    const monthKey        = `${year}-${String(month + 1).padStart(2, '0')}`
+    const isOpen          = openMonths.has(monthKey)
+    const isApproved      = approvedMonths.has(monthKey)
+    const grid            = getMonthGrid(year, month)
     const monthDraftCount = localShows.filter(s => s.status === 'draft' && s.date.startsWith(monthKey)).length
 
     return (
@@ -317,27 +339,39 @@ export default function BookingCalendarTab({
             })}
           </div>
 
-          {/* Approve / Unpublish button */}
+          {/* Approve All / Unpublish */}
           <div className={`mt-4 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
             {isApproved && (
               <p className="text-xs text-emerald-500 font-medium mb-2">✓ Month published</p>
             )}
-            <button
-              onClick={() => toggleApproved(monthKey)}
-              className={`w-full py-2 text-xs font-semibold rounded transition-colors ${
-                isApproved
-                  ? dk(
-                      'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-800/40',
-                      'bg-red-50 text-red-500 hover:bg-red-100 border border-red-200'
-                    )
-                  : dk(
-                      'bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/40 border border-emerald-800/40',
-                      'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
-                    )
-              }`}
-            >
-              {isApproved ? '✕ Unpublish this month' : '✓ Approve'}
-            </button>
+            {!isApproved && monthDraftCount > 0 && (
+              <button
+                onClick={() => approveAllInMonth(monthKey)}
+                disabled={status === 'saving'}
+                className={`w-full py-2 text-xs font-semibold rounded transition-colors disabled:opacity-50 mb-2 ${
+                  dk(
+                    'bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/40 border border-emerald-800/40',
+                    'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                  )
+                }`}
+              >
+                ✓ Approve All
+              </button>
+            )}
+            {isApproved && (
+              <button
+                onClick={() => unpublishMonth(monthKey)}
+                disabled={status === 'saving'}
+                className={`w-full py-2 text-xs font-semibold rounded transition-colors disabled:opacity-50 ${
+                  dk(
+                    'bg-red-900/20 text-red-400 hover:bg-red-900/40 border border-red-800/40',
+                    'bg-red-50 text-red-500 hover:bg-red-100 border border-red-200'
+                  )
+                }`}
+              >
+                ✕ Unpublish this month
+              </button>
+            )}
           </div>
 
         </div>
@@ -347,34 +381,47 @@ export default function BookingCalendarTab({
 
   // ── Modal ───────────────────────────────────────────────────────────────────
 
-  const modalShow = selectedDate
-    ? (publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate) ?? null)
-    : null
-  const isPendingModal = modalShow ? modalShow.status === 'draft' : false
+  const modalShow       = selectedDate ? (publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate) ?? null) : null
+  const isPendingModal  = modalShow?.status === 'draft'
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="grid gap-6">
 
-      {/* Legend */}
-      <div className={`flex flex-wrap gap-5 text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
-        <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-emerald-500/20 ring-emerald-500/40', 'bg-emerald-50 ring-emerald-200')}`} />
-          Published
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-900/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
-          Pending approval
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-gray-700/30 ring-gray-600/40', 'bg-gray-100 ring-gray-300')}`} />
-          Open Mon / Fri
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ${dk('bg-gray-700/50', 'bg-gray-100')}`} />
-          Not a booking day
-        </span>
+      {/* Legend + save status */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className={`flex flex-wrap gap-5 text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
+          <span className="flex items-center gap-1.5">
+            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-emerald-500/20 ring-emerald-500/40', 'bg-emerald-50 ring-emerald-200')}`} />
+            Published
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-900/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
+            Pending approval
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-gray-700/30 ring-gray-600/40', 'bg-gray-100 ring-gray-300')}`} />
+            Open Mon / Fri
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className={`w-5 h-5 rounded flex-shrink-0 ${dk('bg-gray-700/50', 'bg-gray-100')}`} />
+            Not a booking day
+          </span>
+        </div>
+
+        {/* Auto-save status */}
+        {status !== 'idle' && (
+          <span className={`text-xs shrink-0 ${
+            status === 'saving' ? dk('text-gray-400', 'text-gray-500') :
+            status === 'saved'  ? 'text-emerald-500' :
+            'text-red-400'
+          }`}>
+            {status === 'saving' ? 'Saving…' :
+             status === 'saved'  ? '✓ Live in ~30 seconds' :
+             `Error: ${errorMsg || 'something went wrong'}`}
+          </span>
+        )}
       </div>
 
       {/* Month grid */}
@@ -386,38 +433,14 @@ export default function BookingCalendarTab({
         ))}
       </div>
 
-      {/* Save */}
-      <div className="flex items-center gap-4 pt-2">
-        <button
-          onClick={save}
-          disabled={status === 'saving'}
-          className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded text-sm transition-colors"
-        >
-          {status === 'saving' ? 'Publishing…' : 'Publish Changes'}
-        </button>
-        {showsDirty && status === 'idle' && (
-          <span className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
-            Unsaved show edits
-          </span>
-        )}
-        {status === 'saved' && (
-          <span className="text-green-500 text-sm">Published. Live in ~30 seconds.</span>
-        )}
-        {status === 'error' && (
-          <span className="text-red-400 text-sm">{errorMsg || 'Something went wrong.'}</span>
-        )}
-      </div>
-
       {/* Date detail modal */}
       {selectedDate && modalShow && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4"
           onClick={e => { if (e.target === e.currentTarget) closeModal() }}
         >
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-          {/* Panel */}
           <div className={`relative w-full max-w-sm rounded-lg shadow-2xl border p-6 grid gap-5 ${
             dk('bg-gray-900 border-gray-700', 'bg-white border-gray-200')
           }`}>
@@ -473,9 +496,10 @@ export default function BookingCalendarTab({
                 <div className="flex gap-2">
                   <button
                     onClick={confirmModalEdit}
-                    className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 text-white transition-colors"
+                    disabled={status === 'saving'}
+                    className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
                   >
-                    Save Change
+                    {status === 'saving' ? 'Saving…' : 'Save Change'}
                   </button>
                   <button
                     onClick={() => setModalEditing(false)}
@@ -491,29 +515,46 @@ export default function BookingCalendarTab({
 
             {/* Actions */}
             {!modalEditing && (
-              <div className="flex gap-2 pt-1">
-                <button
-                  onClick={() => setModalEditing(true)}
-                  className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
-                    dk(
-                      'border-gray-600 text-gray-300 hover:text-white hover:border-gray-400',
-                      'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500'
-                    )
-                  }`}
-                >
-                  Edit Musician
-                </button>
-                <button
-                  onClick={removeModalShow}
-                  className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
-                    dk(
-                      'border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700',
-                      'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300'
-                    )
-                  }`}
-                >
-                  Remove Show
-                </button>
+              <div className="grid gap-2 pt-1">
+                {isPendingModal && (
+                  <button
+                    onClick={approveShow}
+                    disabled={status === 'saving'}
+                    className={`w-full py-2.5 text-sm font-semibold rounded border transition-colors disabled:opacity-50 ${
+                      dk(
+                        'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/40',
+                        'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                      )
+                    }`}
+                  >
+                    {status === 'saving' ? 'Approving…' : '✓ Approve'}
+                  </button>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setModalEditing(true)}
+                    className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
+                      dk(
+                        'border-gray-600 text-gray-300 hover:text-white hover:border-gray-400',
+                        'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500'
+                      )
+                    }`}
+                  >
+                    Edit Musician
+                  </button>
+                  <button
+                    onClick={removeModalShow}
+                    disabled={status === 'saving'}
+                    className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${
+                      dk(
+                        'border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700',
+                        'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300'
+                      )
+                    }`}
+                  >
+                    Remove Show
+                  </button>
+                </div>
               </div>
             )}
           </div>
