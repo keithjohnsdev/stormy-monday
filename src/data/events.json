@@ -6,7 +6,8 @@
     "startTime": "9pm",
     "description": "Hmm",
     "ticketed": true,
-    "ticketLink": "",
-    "featured": true
+    "ticketLink": "ticketmaster.com",
+    "featured": true,
+    "imageUrl": "/images/events/1779982963915.jpg"
   }
 ]
