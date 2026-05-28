@@ -83,6 +83,7 @@ export default function BookingCalendarTab({
   const [modalEventTicketLink,  setModalEventTicketLink]  = useState('')
   const [modalEventFeatured,    setModalEventFeatured]    = useState(false)
   const [modalEventImageUrl,    setModalEventImageUrl]    = useState('')
+  const [modalEventId,          setModalEventId]          = useState('')
 
   const now      = new Date()
   const todayStr = toDateStr(now)
@@ -203,6 +204,7 @@ export default function BookingCalendarTab({
       setModalEventTicketLink(event?.ticketLink ?? '')
       setModalEventFeatured(event?.featured ?? false)
       setModalEventImageUrl(event?.imageUrl ?? '')
+      setModalEventId(event?.id ?? `evt-${Date.now()}`)
     }
   }
 
@@ -215,6 +217,7 @@ export default function BookingCalendarTab({
     setModalEventName(''); setModalEventTime('9pm'); setModalEventDesc('')
     setModalEventTicketed(false); setModalEventTicketLink(''); setModalEventFeatured(false)
     setModalEventImageUrl('')
+    setModalEventId('')
   }
 
   // ── Show modal actions ───────────────────────────────────────────────────────
@@ -309,7 +312,7 @@ export default function BookingCalendarTab({
     } else {
       // Create new
       const newEvent: CalendarEvent = {
-        id:          `evt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        id:          modalEventId,
         name:        modalEventName.trim(),
         date:        selectedDate,
         startTime:   modalEventTime.trim() || '9pm',
@@ -733,6 +736,7 @@ export default function BookingCalendarTab({
                   <ImageUpload
                     value={modalEventImageUrl || undefined}
                     folder="events"
+                    entityId={modalEventId}
                     password={password}
                     isDark={isDark}
                     onChange={url => setModalEventImageUrl(url)}

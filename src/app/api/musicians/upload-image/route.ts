@@ -14,8 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
   }
 
-  const file   = formData.get('file')   as File   | null
-  const folder = (formData.get('folder') as string | null) ?? 'artists'
+  const file = formData.get('file') as File | null
 
   if (!file || file.size === 0) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -34,13 +33,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'GitHub env vars not configured' }, { status: 500 })
   }
 
-  const bytes    = await file.arrayBuffer()
-  const base64   = Buffer.from(bytes).toString('base64')
-  const ext      = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const filename = `${Date.now()}.${ext}`
-  const repoPath = `public/images/${folder}/${filename}`
-  const publicUrl = `/images/${folder}/${filename}`
+  const bytes     = await file.arrayBuffer()
+  const base64    = Buffer.from(bytes).toString('base64')
+  const repoPath  = `public/images/artists/${artistId}/photo.jpg`
+  const publicUrl = `/images/artists/${artistId}/photo.jpg`
 
+  // Fetch existing SHA so we overwrite in place
   let sha: string | undefined
   const getRes = await fetch(
     `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${repoPath}`,
@@ -61,7 +59,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `upload: ${folder}/${filename} (musician portal — ${artistId})`,
+        message: `upload: artists/${artistId}/photo.jpg (musician portal)`,
         content: base64,
         ...(sha ? { sha } : {}),
       }),

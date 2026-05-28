@@ -3,9 +3,11 @@
 import { useRef, useState } from 'react'
 
 interface Props {
-  /** Currently stored public URL, e.g. /images/artists/xxx.jpg */
+  /** Currently stored public URL, e.g. /images/artists/{id}/photo.jpg */
   value?: string
   folder: 'artists' | 'events'
+  /** Entity ID used to build the stable upload path — omit only when the server derives the ID (musician portal) */
+  entityId?: string
   /** Admin password — if omitted, no X-Admin-Password header is sent (musician portal uses session cookie) */
   password?: string
   /** Upload endpoint — defaults to /api/upload-image */
@@ -14,7 +16,7 @@ interface Props {
   onChange: (url: string) => void
 }
 
-export default function ImageUpload({ value, folder, password, uploadUrl = '/api/upload-image', isDark, onChange }: Props) {
+export default function ImageUpload({ value, folder, entityId, password, uploadUrl = '/api/upload-image', isDark, onChange }: Props) {
   const [uploading,    setUploading]    = useState(false)
   const [error,        setError]        = useState('')
   const [localPreview, setLocalPreview] = useState<string | null>(null)
@@ -38,6 +40,7 @@ export default function ImageUpload({ value, folder, password, uploadUrl = '/api
       const fd = new FormData()
       fd.append('file', file)
       fd.append('folder', folder)
+      if (entityId) fd.append('entityId', entityId)
 
       const headers: Record<string, string> = {}
       if (password) headers['X-Admin-Password'] = password

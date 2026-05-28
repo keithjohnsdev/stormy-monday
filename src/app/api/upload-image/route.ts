@@ -13,11 +13,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
   }
 
-  const file   = formData.get('file')   as File   | null
-  const folder = (formData.get('folder') as string | null) ?? 'misc'
+  const file     = formData.get('file')     as File   | null
+  const folder   = (formData.get('folder')   as string | null) ?? 'misc'
+  const entityId = (formData.get('entityId') as string | null) ?? ''
 
   if (!file || file.size === 0) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+  }
+  if (!entityId) {
+    return NextResponse.json({ error: 'entityId is required' }, { status: 400 })
   }
 
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
@@ -33,14 +37,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'GitHub env vars not configured' }, { status: 500 })
   }
 
-  const bytes    = await file.arrayBuffer()
-  const base64   = Buffer.from(bytes).toString('base64')
-  const ext      = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const filename = `${Date.now()}.${ext}`
-  const repoPath = `public/images/${folder}/${filename}`
-  const publicUrl = `/images/${folder}/${filename}`
+  const bytes     = await file.arrayBuffer()
+  const base64    = Buffer.from(bytes).toString('base64')
+  const repoPath  = `public/images/${folder}/${entityId}/photo.jpg`
+  const publicUrl = `/images/${folder}/${entityId}/photo.jpg`
 
-  // Check for existing SHA (shouldn't happen with timestamp names, but be safe)
+  // Fetch existing SHA so we can overwrite in place
   let sha: string | undefined
   const getRes = await fetch(
     `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${repoPath}`,
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `upload: ${folder}/${filename}`,
+        message: `upload: ${folder}/${entityId}/photo.jpg`,
         content: base64,
         ...(sha ? { sha } : {}),
       }),

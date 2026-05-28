@@ -19,6 +19,7 @@ interface Props {
 export default function ArtistsTab({ initialArtists, password, isDark }: Props) {
   const [artists, setArtists] = useState<Artist[]>(initialArtists)
   const [addForm, setAddForm] = useState(emptyArtist())
+  const [pendingAddId, setPendingAddId] = useState(() => `artist-${Date.now()}`)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Artist | null>(null)
   const [status, setStatus] = useState<SaveStatus>('idle')
@@ -49,9 +50,9 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
 
   function addArtist() {
     if (!addForm.name.trim()) return
-    const id = `artist-${addForm.name.toLowerCase().replace(/[^a-z0-9]+/g, '')}-${Date.now()}`
-    setArtists(prev => [...prev, { ...addForm, id }])
+    setArtists(prev => [...prev, { ...addForm, id: pendingAddId }])
     setAddForm(emptyArtist())
+    setPendingAddId(`artist-${Date.now()}`)
   }
 
   function removeArtist(id: string) {
@@ -182,6 +183,7 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
                   <ImageUpload
                     value={editForm.imageUrl ?? ''}
                     folder="artists"
+                    entityId={editForm.id}
                     password={password}
                     isDark={isDark}
                     onChange={url => setEditForm(f => f ? { ...f, imageUrl: url } : f)}
@@ -262,6 +264,7 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
             <ImageUpload
               value={addForm.imageUrl ?? ''}
               folder="artists"
+              entityId={pendingAddId}
               password={password}
               isDark={isDark}
               onChange={url => setAddForm(f => ({ ...f, imageUrl: url }))}
