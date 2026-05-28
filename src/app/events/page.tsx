@@ -6,8 +6,8 @@ import SectionHeader from '@/components/ui/SectionHeader'
 import { content } from '@/content'
 
 export const metadata: Metadata = {
-  title: 'Events',
-  description: 'Upcoming events and live music at Stormy Monday, Miami Beach.',
+  title: 'Music + Events',
+  description: 'Live music and upcoming events at Stormy Monday, Miami Beach. Shows every Monday and Friday.',
 }
 
 const { music } = content

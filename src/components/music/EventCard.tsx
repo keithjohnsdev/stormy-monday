@@ -20,7 +20,7 @@ export default function EventCard({ show }: Props) {
 
   return (
     <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer flex flex-col">
-      <Link href="/music" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
+      <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the events page`} />
       {/* Artist photo */}
       <div className="aspect-[4/3] bg-storm-dark relative overflow-hidden">
         {show.artistPhoto ? (

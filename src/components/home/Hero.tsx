@@ -69,7 +69,7 @@ export default function Hero() {
             <Link href="/reservations" className="btn-primary w-full sm:w-auto text-center">
               {hero.ctaPrimary}
             </Link>
-            <Link href="/music" className="btn-outline w-full sm:w-auto text-center">
+            <Link href="/events" className="btn-outline w-full sm:w-auto text-center">
               {hero.ctaSecondary}
             </Link>
           </div>

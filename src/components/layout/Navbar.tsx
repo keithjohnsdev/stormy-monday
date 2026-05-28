@@ -15,8 +15,7 @@ function isDarkHour(): boolean {
 const links = [
   { href: '/menu',           label: 'Menu' },
   { href: '/reservations',   label: 'Reservations' },
-  { href: '/music',          label: 'Music' },
-  { href: '/events',         label: 'Events' },
+  { href: '/events',         label: 'Music + Events' },
   { href: '/private-events', label: 'Private Events' },
   { href: '/gallery',        label: 'Gallery' },
   { href: '/about',          label: 'About' },
