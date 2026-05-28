@@ -24,7 +24,7 @@ export const content = {
       headline:     'Stormy Monday',
       tagline:      'When it rains, we pour.',
       ctaPrimary:   'Reserve a Table',
-      ctaSecondary: 'Upcoming Shows',
+      ctaSecondary: 'Upcoming Events',
     },
     infoStrip: {
       hoursLabel:     'Hours',
