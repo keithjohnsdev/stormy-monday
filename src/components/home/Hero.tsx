@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { content } from '@/content'
+import { getHeroSlides } from '@/lib/heroImages'
 import SlowVideo from './SlowVideo'
 import HeroSlideshow from './HeroSlideshow'
 
 const { hero } = content.home
 
 export default function Hero() {
+  const slides = getHeroSlides()
   return (
     <section className="min-h-screen grid lg:grid-cols-2">
 
@@ -80,7 +82,7 @@ export default function Hero() {
       {/* Right panel — animated photo collage (desktop only) */}
       <div className="relative bg-storm-dark hidden lg:block overflow-hidden">
         <div className="absolute inset-0">
-          <HeroSlideshow />
+          <HeroSlideshow slides={slides} />
         </div>
       </div>
 

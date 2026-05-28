@@ -2,45 +2,30 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import type { HeroSlide } from '@/lib/heroImages'
 
-// Press photography — sources: Miami New Times, TimeOut Miami
-// Add Instagram CDN URLs here as they become available
-const SLIDES = [
-  {
-    src: 'https://www.miaminewtimes.com/wp-content/uploads/sites/4/2026/03/CP1A255401.jpg',
-    alt: 'The bar at Stormy Monday',
-  },
-  // {
-  //   src: 'https://www.miaminewtimes.com/wp-content/uploads/sites/4/2026/03/storymy-monday-2-e1772473503670.jpg',
-  //   alt: 'Inside Stormy Monday, Miami Beach',
-  // },
-  // {
-  //   src: 'https://media.timeout.com/images/106379421/750/422/image.jpg',
-  //   alt: 'Stormy Monday — TimeOut Miami',
-  // },
-  {
-    src: 'https://www.miaminewtimes.com/wp-content/uploads/sites/4/2026/03/stormy-monday-e1772473529632.png',
-    alt: 'James MacInnes and Chef Seth Blumenthal',
-  },
-]
+const DISPLAY_MS  = 6000
+const DISSOLVE_MS = 1500
 
-const DISPLAY_MS  = 10000  // how long each image shows
-const DISSOLVE_MS = 1500  // crossfade duration
+interface Props {
+  slides: HeroSlide[]
+}
 
-export default function HeroSlideshow() {
+export default function HeroSlideshow({ slides }: Props) {
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
+    if (slides.length < 2) return
     const t = setInterval(
-      () => setCurrent(i => (i + 1) % SLIDES.length),
+      () => setCurrent(i => (i + 1) % slides.length),
       DISPLAY_MS
     )
     return () => clearInterval(t)
-  }, [])
+  }, [slides.length])
 
   return (
     <div className="relative w-full h-full overflow-hidden">
-      {SLIDES.map(({ src, alt }, i) => (
+      {slides.map(({ src, alt }, i) => (
         <div
           key={src}
           className={`absolute inset-0 animate-ken-burns transition-opacity ease-in-out ${
@@ -49,7 +34,7 @@ export default function HeroSlideshow() {
           style={{
             transitionDuration: `${DISSOLVE_MS}ms`,
             // stagger each slide through the 20s Ken Burns cycle so no two look identical
-            animationDelay: `${-(i * (20 / SLIDES.length))}s`,
+            animationDelay: `${-(i * (20 / slides.length))}s`,
           }}
         >
           <Image
