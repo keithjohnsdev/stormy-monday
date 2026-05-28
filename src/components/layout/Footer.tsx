@@ -66,6 +66,13 @@ export default function Footer() {
           <Link href="/press" className="text-sm text-storm-muted hover:text-storm-gold transition-colors block">
             Press
           </Link>
+          <div className="gold-divider" />
+          <Link href="/admin" className="text-xs text-storm-border hover:text-storm-muted transition-colors block mb-2">
+            Admin
+          </Link>
+          <Link href="/musicians" className="text-xs text-storm-border hover:text-storm-muted transition-colors block">
+            Musician Portal
+          </Link>
         </div>
 
       </div>
