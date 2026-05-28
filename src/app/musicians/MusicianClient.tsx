@@ -321,8 +321,8 @@ function CalendarTab({
         <div className="bg-green-900/20 border border-green-700/40 px-6 py-5">
           <p className="text-green-400 font-semibold mb-1">Booking request submitted ✓</p>
           <p className="text-storm-muted text-sm leading-relaxed">
-            {formatFullDate(selected)} is pending James&apos;s approval. Once approved,
-            your show will appear on the public schedule. James will be in touch with any details.
+            {formatFullDate(selected)} is pending approval. Once approved,
+            your show will appear on the public schedule. We will be in touch with any details.
           </p>
           <button
             onClick={() => { setSelected(null); setBookingState('idle') }}
