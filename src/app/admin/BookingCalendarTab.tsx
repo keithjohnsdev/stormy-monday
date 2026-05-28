@@ -357,14 +357,6 @@ export default function BookingCalendarTab({
   return (
     <div className="grid gap-6">
 
-      {/* Description */}
-      <p className={`text-sm leading-relaxed ${dk('text-gray-400', 'text-gray-600')}`}>
-        <strong className={dk('text-gray-200', 'text-gray-800')}>Open for booking</strong> — musicians can self-book through the portal.
-        Use <strong className={dk('text-gray-200', 'text-gray-800')}>Approve</strong> on a month to push pending bookings live. Click again to unpublish.
-        Click any <span className="text-amber-500">booked date</span> to edit or remove it.
-        Orange = pending · Amber = published · Green = open &amp; available.
-      </p>
-
       {/* Legend */}
       <div className={`flex flex-wrap gap-5 text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
         <span className="flex items-center gap-1.5">
