@@ -88,5 +88,20 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
+  },
+  {
+    "id": "1779989167546-rw2n4",
+    "date": "2026-06-12",
+    "startTime": "9pm",
+    "artistId": "artist-keithjohns",
+    "artistName": "Keith Johns",
+    "genre": "Singer/Songwriter",
+    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
+    "artistWebsite": "https://www.keithjohnsmusic.com",
+    "artistPhoto": "/images/artists/artist-keithjohns/photo.jpg",
+    "ticketed": false,
+    "ticketLink": "",
+    "featured": false,
+    "status": "published"
   }
 ]
