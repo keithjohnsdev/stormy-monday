@@ -58,5 +58,20 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
+  },
+  {
+    "id": "1779989161460-mcqw7",
+    "date": "2026-06-05",
+    "startTime": "9pm",
+    "artistId": "artist-oigo",
+    "artistName": "OIGO",
+    "genre": "Groove / Jazz / Fusion",
+    "description": "OIGO is the solo project of Venezuelan-born, Miami-based multi-instrumentalist Adrian Gonzalez — best known as a driving force behind the beloved Miami ensemble Suenalo. Performing with a loop station, guitar, keys, and his voice, OIGO crafts groove-forward, genre-fluid original songs that feel both familiar and utterly unique. A South Florida staple for over two decades.",
+    "artistWebsite": "https://oigomusic.com",
+    "artistPhoto": "/images/artists/artist-oigo/photo.jpg",
+    "ticketed": false,
+    "ticketLink": "",
+    "featured": false,
+    "status": "published"
   }
 ]
