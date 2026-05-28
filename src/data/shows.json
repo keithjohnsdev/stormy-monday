@@ -12,7 +12,7 @@
     "artistWebsite": "https://www.keithjohnsmusic.com",
     "coverCharge": "Free",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   },
   {
     "id": "show-20260608",
@@ -27,6 +27,6 @@
     "artistWebsite": "https://www.keithjohnsmusic.com",
     "coverCharge": "Free",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   }
 ]
