@@ -1,5 +1,5 @@
 // Auto-generated — do not edit directly.
-// Last updated via content editor: 2026-05-27T17:25:58.497Z
+// Last updated via content editor: 2026-05-28T18:48:15.555Z
 
 export const content = {
 
@@ -36,7 +36,8 @@ export const content = {
       cta:            'Make a Reservation',
     },
     upcomingShows: {
-      heading:      'Upcoming Events',
+      eyebrow:      'Live Music',
+      heading:      'Upcoming Shows',
       scheduleLink: 'Full Schedule →',
       emptyMessage: 'Check back soon — new shows and events announced regularly.',
       followCta:    'Follow @stormymondaymia',
@@ -160,7 +161,7 @@ export const content = {
       { day: 'Wednesday', time: 'Closed' },
       { day: 'Thursday', time: '5pm – 1am' },
       { day: 'Friday', time: '5pm – 1am', liveMusic: '8pm – 11pm' },
-      { day: 'Saturday', time: '5pm – 1am' },
+      { day: 'Saturday', time: '5pm – 1am', liveMusic: 'Vinyl 9-12am' },
       { day: 'Sunday', time: '5pm – 1am' },
     ],
   },
