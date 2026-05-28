@@ -63,9 +63,12 @@ export default function BookingCalendarTab({
   const [errorMsg,       setErrorMsg]       = useState('')
 
   // ── Modal state ─────────────────────────────────────────────────────────────
-  const [selectedDate,  setSelectedDate]  = useState<string | null>(null)
-  const [modalEditing,  setModalEditing]  = useState(false)
-  const [modalArtistId, setModalArtistId] = useState('')
+  const [selectedDate,    setSelectedDate]    = useState<string | null>(null)
+  const [modalEditing,    setModalEditing]    = useState(false)
+  const [modalArtistId,   setModalArtistId]   = useState('')
+  const [modalTicketed,   setModalTicketed]   = useState(false)
+  const [modalFeatured,   setModalFeatured]   = useState(false)
+  const [modalTicketLink, setModalTicketLink] = useState('')
 
   const now      = new Date()
   const todayStr = toDateStr(now)
@@ -145,12 +148,18 @@ export default function BookingCalendarTab({
     setSelectedDate(dateStr)
     setModalEditing(false)
     setModalArtistId(show?.artistId ?? artists[0]?.id ?? '')
+    setModalTicketed(false)
+    setModalFeatured(false)
+    setModalTicketLink('')
   }
 
   function closeModal() {
     setSelectedDate(null)
     setModalEditing(false)
     setModalArtistId('')
+    setModalTicketed(false)
+    setModalFeatured(false)
+    setModalTicketLink('')
   }
 
   async function approveShow() {
@@ -209,9 +218,9 @@ export default function BookingCalendarTab({
       genre:         artist.genre,
       description:   artist.description,
       artistWebsite: artist.website || '',
-      ticketed:      false,
-      ticketLink:    '',
-      featured:      false,
+      ticketed:      modalTicketed,
+      ticketLink:    modalTicketed ? modalTicketLink.trim() : '',
+      featured:      modalFeatured,
       status:        'published',
     }
     const newShows = [...localShows, newShow]
@@ -513,6 +522,37 @@ export default function BookingCalendarTab({
                     <option key={a.id} value={a.id}>{a.name}</option>
                   ))}
                 </select>
+                <div className="flex items-center gap-5">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={modalFeatured}
+                      onChange={e => setModalFeatured(e.target.checked)}
+                      className="accent-amber-500 w-4 h-4"
+                    />
+                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Featured</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={modalTicketed}
+                      onChange={e => { setModalTicketed(e.target.checked); if (!e.target.checked) setModalTicketLink('') }}
+                      className="accent-amber-500 w-4 h-4"
+                    />
+                    <span className={`text-sm ${dk('text-gray-300', 'text-gray-700')}`}>Ticketed</span>
+                  </label>
+                </div>
+                {modalTicketed && (
+                  <input
+                    type="url"
+                    placeholder="Ticket URL"
+                    value={modalTicketLink}
+                    onChange={e => setModalTicketLink(e.target.value)}
+                    className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+                      dk('bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500', 'bg-white border-gray-300 text-gray-800 placeholder:text-gray-400')
+                    }`}
+                  />
+                )}
                 <div className="flex gap-2">
                   <button
                     onClick={addShow}
