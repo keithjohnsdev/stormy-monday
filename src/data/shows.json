@@ -43,6 +43,21 @@
     "status": "published"
   },
   {
+    "id": "show-20260807",
+    "artistId": "artist-keithjohns",
+    "artistName": "Keith Johns",
+    "date": "2026-08-07",
+    "startTime": "8pm",
+    "genre": "Singer/Songwriter",
+    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
+    "ticketed": false,
+    "ticketLink": "",
+    "artistWebsite": "https://www.keithjohnsmusic.com",
+    "coverCharge": "Free",
+    "featured": false,
+    "status": "draft"
+  },
+  {
     "id": "1779943498609-vk43s",
     "date": "2026-10-30",
     "startTime": "9pm",
