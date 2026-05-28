@@ -681,7 +681,7 @@ export default function MusicianClient({
                 STORMY MONDAY
               </Link>
               <div className="flex items-center gap-4">
-                <p className="text-sm text-storm-muted">{artist.name}</p>
+                <span className="text-sm text-storm-muted">{artist.name}</span>
                 <button
                   onClick={handleLogout}
                   className="text-xs text-storm-muted hover:text-storm-cream uppercase tracking-widest transition-colors"
