@@ -98,6 +98,7 @@ export default function BookingCalendarTab({
   ) {
     setStatus('saving')
     setErrorMsg('')
+    console.log('shows:', JSON.parse(JSON.stringify(newShows ?? localShows)))
     try {
       if (newShows !== null) {
         const r = await fetch('/api/save-shows', {
@@ -218,10 +219,16 @@ export default function BookingCalendarTab({
   }
 
   async function unpublishMonth(monthKey: string) {
+    const newShows = localShows.map(s =>
+      s.date.startsWith(monthKey) && s.status === 'published'
+        ? { ...s, status: 'draft' as const }
+        : s
+    )
     const newApproved = new Set(approvedMonths)
     newApproved.delete(monthKey)
+    setLocalShows(newShows)
     setApprovedMonths(newApproved)
-    await autoSave(null, openMonths, newApproved)
+    await autoSave(newShows, openMonths, newApproved)
   }
 
   // ── Month card renderer ──────────────────────────────────────────────────────
