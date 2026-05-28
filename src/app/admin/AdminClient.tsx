@@ -320,7 +320,9 @@ export default function AdminClient({
                 </button>
               ))}
             </div>
-            <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
+            <div className="hidden sm:block">
+              <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
+            </div>
           </div>
         </div>
 
@@ -533,6 +535,13 @@ export default function AdminClient({
           </>}
 
         </div>
+
+        {/* Mobile theme toggle — bottom of page */}
+        <div className={`sm:hidden border-t px-6 py-4 flex items-center gap-3 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
+          <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Theme</span>
+          <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
+        </div>
+
       </div>
     </ThemeCtx.Provider>
   )
