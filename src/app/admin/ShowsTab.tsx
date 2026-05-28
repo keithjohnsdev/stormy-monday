@@ -58,6 +58,7 @@ export default function ShowsTab({ initialShows, artists, password, isDark, onAu
       ticketed,
       ticketLink: ticketed ? ticketLink.trim() : '',
       artistWebsite: selectedArtist.website || '',
+      artistPhoto: selectedArtist.imageUrl || '',
       coverCharge: selectedArtist.defaultCoverCharge,
       featured,
       status: 'published',

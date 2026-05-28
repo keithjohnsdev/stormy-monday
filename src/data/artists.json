@@ -11,33 +11,36 @@
     "imageUrl": "/images/artists/1779981809666.jpg"
   },
   {
-    "id": "artist-blueroomquartet",
-    "name": "The Blue Room Quartet",
-    "genre": "Live Jazz",
-    "description": "A four-piece jazz ensemble bringing standards and originals to the Alton Road room.",
+    "id": "artist-alejandro-elizondo",
+    "name": "Alejandro Elizondo",
+    "genre": "Folk / Americana / Soul",
+    "description": "Miami-based singer-songwriter and multi-instrumentalist rooted in folk, soul, and Americana. A core member of The Wynwood String Band, he has been a fixture of Miami's independent music scene at venues like the Wynwood Yard and the Miami Folk & Indie Festival. His music blends acoustic warmth with heartfelt songwriting that connects naturally with live audiences.",
+    "website": "https://www.instagram.com/alejandroelizondomusic/",
+    "defaultCoverCharge": "Free",
+    "email": "",
+    "password": "",
+    "imageUrl": "/images/artists/alejandro-elizondo.jpg"
+  },
+  {
+    "id": "artist-oigo",
+    "name": "OIGO",
+    "genre": "Groove / Jazz / Fusion",
+    "description": "OIGO is the solo project of Venezuelan-born, Miami-based multi-instrumentalist Adrian Gonzalez — best known as a driving force behind the beloved Miami ensemble Suenalo. Performing with a loop station, guitar, keys, and his voice, OIGO crafts groove-forward, genre-fluid original songs that feel both familiar and utterly unique. A South Florida staple for over two decades.",
+    "website": "https://oigomusic.com",
+    "defaultCoverCharge": "Free",
+    "email": "",
+    "password": "",
+    "imageUrl": "/images/artists/oigo.png"
+  },
+  {
+    "id": "artist-carlos-tramora",
+    "name": "Carlos Tramora",
+    "genre": "Live Music",
+    "description": "Miami-based musician and live performer.",
     "website": "",
     "defaultCoverCharge": "Free",
     "email": "",
-    "password": ""
-  },
-  {
-    "id": "artist-elianaruiz",
-    "name": "Eliana Ruiz",
-    "genre": "Solo Guitar & Vocals",
-    "description": "Miami-based singer-songwriter blending Latin folk with soul.",
-    "website": "",
-    "defaultCoverCharge": "Free",
-    "email": "",
-    "password": ""
-  },
-  {
-    "id": "artist-altonroadblues",
-    "name": "The Alton Road Blues Band",
-    "genre": "Blues",
-    "description": "Classic electric blues — three-piece, loud in all the right ways.",
-    "website": "https://www.instagram.com/stormymondaymia/",
-    "defaultCoverCharge": "Free",
-    "email": "",
-    "password": ""
+    "password": "",
+    "imageUrl": ""
   }
 ]
