@@ -73,5 +73,20 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
+  },
+  {
+    "id": "1779988793052-whbb8",
+    "date": "2026-06-19",
+    "startTime": "9pm",
+    "artistId": "artist-carlos-tramora",
+    "artistName": "Carlos Tramora",
+    "genre": "Live Music",
+    "description": "Miami-based musician and live performer.",
+    "artistWebsite": "",
+    "artistPhoto": "",
+    "ticketed": false,
+    "ticketLink": "",
+    "featured": false,
+    "status": "published"
   }
 ]
