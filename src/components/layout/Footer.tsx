@@ -5,9 +5,9 @@ const { site, footer } = content
 
 const navLinks: [string, string][] = [
   ['/menu',           'Menu'],
+  ['/reservations',   'Reservations'],
   ['/music',          'Music'],
   ['/events',         'Events'],
-  ['/reservations',   'Reservations'],
   ['/private-events', 'Private Events'],
   ['/gallery',        'Gallery'],
   ['/about',          'About'],
