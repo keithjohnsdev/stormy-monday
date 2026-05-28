@@ -324,6 +324,11 @@ export default function AdminClient({
               <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
             </div>
           </div>
+          {/* Mobile theme toggle — below tabs, inside sticky header */}
+          <div className={`sm:hidden max-w-3xl mx-auto px-6 py-2 flex items-center gap-3 border-t ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
+            <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Theme</span>
+            <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
+          </div>
         </div>
 
         <div className="max-w-3xl mx-auto px-6 pt-10 pb-8 grid gap-4">
@@ -534,12 +539,6 @@ export default function AdminClient({
 
           </>}
 
-        </div>
-
-        {/* Mobile theme toggle — bottom of page */}
-        <div className={`sm:hidden border-t px-6 py-4 flex items-center gap-3 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
-          <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Theme</span>
-          <ThemeToggle isDark={isDark} onChange={(dark) => { setIsDark(dark); setManualOverride(true) }} />
         </div>
 
       </div>
