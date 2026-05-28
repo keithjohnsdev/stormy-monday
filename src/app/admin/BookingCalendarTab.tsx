@@ -224,7 +224,7 @@ export default function BookingCalendarTab({
             <p className={`font-semibold text-sm ${dk('text-gray-100', 'text-gray-800')}`}>
               {MONTH_NAMES[month]} {year}
               {monthDraftCount > 0 && (
-                <span className="ml-2 text-xs font-normal text-orange-400">
+                <span className="ml-2 text-xs font-normal text-amber-400">
                   {monthDraftCount} pending
                 </span>
               )}
@@ -276,21 +276,21 @@ export default function BookingCalendarTab({
                 cls += dk('text-gray-700', 'text-gray-300')
               } else if (isPending) {
                 cls += past
-                  ? dk('text-orange-900 bg-orange-900/10', 'text-orange-300 bg-orange-50')
-                  : 'bg-orange-900/20 text-orange-300 font-bold ring-1 ring-orange-500/40'
-                if (clickable) cls += dk(' hover:ring-2 hover:ring-orange-400/60', ' hover:ring-2 hover:ring-orange-400/60')
+                  ? dk('text-amber-900 bg-amber-900/10', 'text-amber-700 bg-amber-50')
+                  : 'bg-amber-900/20 text-amber-300 font-bold ring-1 ring-amber-500/40'
+                if (clickable) cls += ' hover:ring-2 hover:ring-amber-400/60'
               } else if (published && past) {
-                cls += dk('text-amber-800 bg-amber-900/20', 'text-amber-300 bg-amber-50')
-                if (clickable) cls += dk(' hover:ring-2 hover:ring-amber-600/60', ' hover:ring-2 hover:ring-amber-400/60')
+                cls += dk('text-emerald-800 bg-emerald-900/20', 'text-emerald-700 bg-emerald-50')
+                if (clickable) cls += dk(' hover:ring-2 hover:ring-emerald-600/60', ' hover:ring-2 hover:ring-emerald-400/60')
               } else if (published) {
-                cls += 'bg-amber-500/20 text-amber-400 font-bold ring-1 ring-amber-500/40'
-                if (clickable) cls += ' hover:ring-2 hover:ring-amber-400/80'
+                cls += 'bg-emerald-500/20 text-emerald-400 font-bold ring-1 ring-emerald-500/40'
+                if (clickable) cls += ' hover:ring-2 hover:ring-emerald-400/80'
               } else if (past) {
                 cls += dk('text-gray-600', 'text-gray-400')
               } else {
                 cls += dk(
-                  'bg-emerald-900/30 text-emerald-400 font-semibold ring-1 ring-emerald-700/40',
-                  'bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-emerald-200'
+                  'bg-gray-700/30 text-gray-400 font-semibold ring-1 ring-gray-600/40',
+                  'bg-gray-100 text-gray-500 font-semibold ring-1 ring-gray-300'
                 )
               }
 
@@ -308,9 +308,9 @@ export default function BookingCalendarTab({
                 >
                   {day.getDate()}
                   {show && (
-                    <span className={`absolute top-0.5 right-0.5 w-1 h-1 rounded-full ${
-                      isPending ? 'bg-orange-400' : 'bg-amber-400'
-                    }`} />
+                    isPending
+                      ? <span className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-amber-400" />
+                      : <span className="absolute top-0 right-0.5 text-[9px] leading-none font-bold text-emerald-400">✓</span>
                   )}
                 </div>
               )
@@ -360,15 +360,15 @@ export default function BookingCalendarTab({
       {/* Legend */}
       <div className={`flex flex-wrap gap-5 text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
         <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-500/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
+          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-emerald-500/20 ring-emerald-500/40', 'bg-emerald-50 ring-emerald-200')}`} />
           Published
         </span>
         <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-orange-900/20 ring-orange-500/40', 'bg-orange-50 ring-orange-200')}`} />
+          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-900/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
           Pending approval
         </span>
         <span className="flex items-center gap-1.5">
-          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-emerald-900/30 ring-emerald-700/40', 'bg-emerald-50 ring-emerald-200')}`} />
+          <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-gray-700/30 ring-gray-600/40', 'bg-gray-100 ring-gray-300')}`} />
           Open Mon / Fri
         </span>
         <span className="flex items-center gap-1.5">
@@ -435,7 +435,7 @@ export default function BookingCalendarTab({
             {/* Date + status */}
             <div>
               <p className={`text-xs uppercase tracking-widest mb-1.5 ${
-                isPendingModal ? 'text-orange-400' : 'text-amber-500'
+                isPendingModal ? 'text-amber-400' : 'text-emerald-500'
               }`}>
                 {isPendingModal ? 'Pending Approval' : 'Published'}
               </p>
