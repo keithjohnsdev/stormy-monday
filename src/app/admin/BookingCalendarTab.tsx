@@ -19,7 +19,7 @@ function getMonthGrid(year: number, month: number): Array<Date | null> {
   const grid: Array<Date | null> = []
   for (let i = 0; i < first.getDay(); i++) grid.push(null)
   for (let d = 1; d <= last.getDate(); d++) grid.push(new Date(year, month, d))
-  while (grid.length % 7 !== 0) grid.push(null)
+  while (grid.length < 42) grid.push(null) // always 6 rows → consistent card height
   return grid
 }
 
