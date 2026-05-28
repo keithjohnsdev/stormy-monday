@@ -60,7 +60,7 @@ export default function UpcomingShows({ shows, events }: Props) {
           <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${title}`} />
 
           {card.featured && (
-            <div className="absolute top-3 left-3 bg-storm-gold text-storm-black text-xs px-2 py-1 font-semibold tracking-wider uppercase z-10">
+            <div className="absolute top-3 right-3 bg-storm-gold text-storm-black text-xs px-2 py-1 font-semibold tracking-wider uppercase z-10">
               Featured
             </div>
           )}
