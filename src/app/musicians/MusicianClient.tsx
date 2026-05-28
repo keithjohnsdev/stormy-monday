@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import type { StoredShow } from '@/types'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -672,17 +673,22 @@ export default function MusicianClient({
         <>
           {/* Sticky header */}
           <div className="sticky top-0 z-10 bg-storm-black border-b border-storm-border">
-            <div className="max-w-3xl mx-auto px-6 pt-4 flex items-start justify-between">
-              <div>
-                <p className="text-xs text-storm-muted uppercase tracking-widest">Stormy Monday</p>
-                <p className="text-storm-cream font-semibold">{artist.name}</p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="text-xs text-storm-muted hover:text-storm-cream uppercase tracking-widest transition-colors mt-1"
+            <div className="max-w-3xl mx-auto px-6 pt-4 flex items-center justify-between">
+              <Link
+                href="/"
+                className="font-display text-xl tracking-widest text-storm-cream hover:text-storm-gold transition-colors"
               >
-                Sign Out
-              </button>
+                STORMY MONDAY
+              </Link>
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-storm-muted">{artist.name}</p>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-storm-muted hover:text-storm-cream uppercase tracking-widest transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
             <div className="max-w-3xl mx-auto px-6 flex gap-1 mt-3">
               {tabs.map(tab => (
