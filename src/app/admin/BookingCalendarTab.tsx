@@ -341,9 +341,6 @@ export default function BookingCalendarTab({
 
           {/* Approve All / Unpublish */}
           <div className={`mt-4 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
-            {isApproved && (
-              <p className="text-xs text-emerald-500 font-medium mb-2">✓ Month published</p>
-            )}
             {!isApproved && monthDraftCount > 0 && (
               <button
                 onClick={() => approveAllInMonth(monthKey)}
@@ -369,7 +366,7 @@ export default function BookingCalendarTab({
                   )
                 }`}
               >
-                ✕ Unpublish this month
+                ✕ Unapprove All
               </button>
             )}
           </div>
