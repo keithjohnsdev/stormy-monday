@@ -126,7 +126,7 @@ export default function ImageUpload({ value, folder, entityId, password, uploadU
         </div>
         {uploading && (
           <p className={`text-xs mt-1 ${d('text-gray-500', 'text-gray-400')}`}>
-            Uploading to GitHub…
+            Uploading…
           </p>
         )}
         {!uploading && error && (
