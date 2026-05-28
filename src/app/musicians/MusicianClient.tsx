@@ -375,18 +375,18 @@ function CalendarTab({
 
           {/* Booking modal */}
           {selected && selectedInfo && bookingState !== 'booked' && (
-            <div
-              className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-              onClick={e => {
-                if (e.target === e.currentTarget && bookingState !== 'booking') {
-                  setSelected(null)
-                  setBookingState('idle')
-                  setErrorMsg('')
-                }
-              }}
-            >
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
               {/* Backdrop */}
-              <div className="absolute inset-0 bg-storm-black/80 backdrop-blur-sm" />
+              <div
+                className="absolute inset-0 bg-storm-black/80 backdrop-blur-sm"
+                onClick={() => {
+                  if (bookingState !== 'booking') {
+                    setSelected(null)
+                    setBookingState('idle')
+                    setErrorMsg('')
+                  }
+                }}
+              />
 
               {/* Panel */}
               <div className="relative bg-storm-card border border-storm-gold/40 p-8 w-full max-w-sm grid gap-5 shadow-2xl">

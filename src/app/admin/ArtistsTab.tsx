@@ -96,7 +96,7 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
                   {a.genre}
                   {a.email ? (
                     <span className={`ml-2 text-xs ${d('text-green-400', 'text-green-600')}`}>
-                      · Portal: {a.email}
+                      · Login: {a.email}
                     </span>
                   ) : (
                     <span className={`ml-2 text-xs ${d('text-gray-600', 'text-gray-400')}`}>· No portal access</span>
@@ -162,10 +162,10 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
                 </div>
                 <div className={`border-t pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 ${d('border-gray-700', 'border-gray-200')}`}>
                   <div>
-                    <label className={labelCls}>Portal Login Email</label>
-                    <input type="email" value={editForm.email ?? ''}
+                    <label className={labelCls}>Portal Login</label>
+                    <input type="text" value={editForm.email ?? ''}
                       onChange={e => setEditForm(f => f ? { ...f, email: e.target.value } : f)}
-                      placeholder="musician@email.com" className={inputCls} />
+                      placeholder="username or email" className={inputCls} />
                   </div>
                   <div>
                     <label className={labelCls}>Portal Password</label>
@@ -247,10 +247,10 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
           </div>
           <div className={`border-t pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 ${d('border-gray-700', 'border-gray-200')}`}>
             <div>
-              <label className={labelCls}>Portal Login Email</label>
-              <input type="email" value={addForm.email ?? ''}
+              <label className={labelCls}>Portal Login</label>
+              <input type="text" value={addForm.email ?? ''}
                 onChange={e => setAddForm(f => ({ ...f, email: e.target.value }))}
-                placeholder="musician@email.com" className={inputCls} />
+                placeholder="username or email" className={inputCls} />
             </div>
             <div>
               <label className={labelCls}>Portal Password</label>
