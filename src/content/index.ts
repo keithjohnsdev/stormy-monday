@@ -36,10 +36,9 @@ export const content = {
       cta:            'Make a Reservation',
     },
     upcomingShows: {
-      eyebrow:      'Live Music',
-      heading:      'Upcoming Shows',
+      heading:      'Upcoming Events',
       scheduleLink: 'Full Schedule →',
-      emptyMessage: 'Check back soon — new shows announced regularly.',
+      emptyMessage: 'Check back soon — new shows and events announced regularly.',
       followCta:    'Follow @stormymondaymia',
     },
     pressStrip: {
