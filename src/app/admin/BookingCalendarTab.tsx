@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { StoredShow } from '@/types'
+import type { Artist, StoredShow } from '@/types'
 
 // ─── Calendar helpers ──────────────────────────────────────────────────────────
 
@@ -33,6 +33,7 @@ const DAY_ABBR = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
 interface Props {
   shows: StoredShow[]
+  artists: Artist[]
   initialOpenMonths: string[]
   initialApprovedMonths: string[]
   password: string
@@ -41,7 +42,8 @@ interface Props {
 }
 
 export default function BookingCalendarTab({
-  shows,
+  shows: initialShows,
+  artists,
   initialOpenMonths,
   initialApprovedMonths,
   password,
@@ -50,6 +52,10 @@ export default function BookingCalendarTab({
 }: Props) {
   const [openMonths,     setOpenMonths]     = useState<Set<string>>(new Set(initialOpenMonths))
   const [approvedMonths, setApprovedMonths] = useState<Set<string>>(new Set(initialApprovedMonths))
+  const [localShows,     setLocalShows]     = useState<StoredShow[]>(initialShows)
+  const [showsDirty,     setShowsDirty]     = useState(false)
+  const [editingId,      setEditingId]      = useState<string | null>(null)
+  const [editArtistId,   setEditArtistId]   = useState('')
   const [status,   setStatus]   = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -63,11 +69,49 @@ export default function BookingCalendarTab({
     return { year: d.getFullYear(), month: d.getMonth() }
   })
 
-  // Separate published vs draft for display
-  const publishedShows = shows.filter(s => s.status === 'published')
-  const draftShows     = shows.filter(s => s.status === 'draft')
+  // Derive display maps from local (mutable) shows
+  const publishedShows  = localShows.filter(s => s.status === 'published')
+  const draftShows      = localShows.filter(s => s.status === 'draft')
   const publishedByDate = new Map(publishedShows.map(s => [s.date, s]))
   const draftByDate     = new Map(draftShows.map(s => [s.date, s]))
+
+  // ── Show edits ──────────────────────────────────────────────────────────────
+
+  function startEdit(show: StoredShow) {
+    setEditingId(show.id)
+    setEditArtistId(show.artistId)
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditArtistId('')
+  }
+
+  function confirmEdit(showId: string) {
+    const artist = artists.find(a => a.id === editArtistId)
+    if (!artist) return
+    setLocalShows(prev => prev.map(s =>
+      s.id !== showId ? s : {
+        ...s,
+        artistId:     artist.id,
+        artistName:   artist.name,
+        genre:        artist.genre,
+        description:  artist.description,
+        artistWebsite: artist.website || '',
+      }
+    ))
+    setShowsDirty(true)
+    setEditingId(null)
+    setEditArtistId('')
+  }
+
+  function removeShow(showId: string) {
+    setLocalShows(prev => prev.filter(s => s.id !== showId))
+    setShowsDirty(true)
+    if (editingId === showId) cancelEdit()
+  }
+
+  // ── Toggles ─────────────────────────────────────────────────────────────────
 
   function toggleOpen(monthKey: string) {
     setOpenMonths(prev => {
@@ -87,10 +131,30 @@ export default function BookingCalendarTab({
     setStatus('idle')
   }
 
+  // ── Save ────────────────────────────────────────────────────────────────────
+
   async function save() {
     setStatus('saving')
     setErrorMsg('')
     try {
+      // 1. Flush any show edits first so the booking-config save sees current shows
+      if (showsDirty) {
+        const showsRes = await fetch('/api/save-shows', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+          body: JSON.stringify({ shows: localShows }),
+        })
+        if (showsRes.status === 401) { onAuthError(); return }
+        if (!showsRes.ok) {
+          const body = await showsRes.json().catch(() => ({}))
+          setErrorMsg((body as { error?: string }).error ?? `HTTP ${showsRes.status}`)
+          setStatus('error')
+          return
+        }
+        setShowsDirty(false)
+      }
+
+      // 2. Save booking config (also promotes approved drafts to published)
       const res = await fetch('/api/save-booking-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
@@ -114,13 +178,96 @@ export default function BookingCalendarTab({
     }
   }
 
+  // ── Render helpers ───────────────────────────────────────────────────────────
+
+  const selectCls = `text-xs border rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-amber-400 ${
+    dk('bg-gray-700 border-gray-600 text-gray-100', 'bg-white border-gray-300 text-gray-800')
+  }`
+
+  function renderShowRow(s: StoredShow, color: 'amber' | 'orange') {
+    const d       = new Date(s.date + 'T00:00:00')
+    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]
+    const isPast  = s.date < todayStr
+    const isEditing = editingId === s.id
+
+    const dateCls = color === 'amber'
+      ? 'text-amber-500'
+      : 'text-orange-400'
+
+    if (isEditing) {
+      return (
+        <div key={s.id} className="flex items-center gap-2 flex-wrap py-0.5">
+          <span className={`text-xs font-semibold shrink-0 tabular-nums w-14 ${dateCls}`}>
+            {dayName} {d.getDate()}
+          </span>
+          <select
+            value={editArtistId}
+            onChange={e => setEditArtistId(e.target.value)}
+            className={`${selectCls} flex-1 min-w-0`}
+          >
+            {artists.map(a => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => confirmEdit(s.id)}
+            className="text-xs text-emerald-400 hover:text-emerald-300 font-bold shrink-0"
+            title="Confirm"
+          >✓</button>
+          <button
+            onClick={cancelEdit}
+            className={`text-xs shrink-0 ${dk('text-gray-500 hover:text-gray-300', 'text-gray-400 hover:text-gray-600')}`}
+            title="Cancel"
+          >✕</button>
+        </div>
+      )
+    }
+
+    return (
+      <div key={s.id} className={`flex items-center gap-1.5 ${isPast ? 'opacity-40' : ''}`}>
+        <span className={`text-xs font-semibold shrink-0 tabular-nums w-14 ${dateCls}`}>
+          {dayName} {d.getDate()}
+        </span>
+        <span className={`text-xs truncate flex-1 ${dk('text-gray-300', 'text-gray-700')}`}>
+          {s.artistName}
+        </span>
+        {color === 'orange' && (
+          <span className={`text-xs shrink-0 px-1.5 py-0.5 rounded font-medium ${
+            dk('bg-orange-900/40 text-orange-300', 'bg-orange-50 text-orange-600')
+          }`}>
+            Pending
+          </span>
+        )}
+        {s.featured && color === 'amber' && (
+          <span className="text-xs text-amber-500 shrink-0">★</span>
+        )}
+        {/* Edit / Remove */}
+        <button
+          onClick={() => startEdit(s)}
+          className={`text-xs shrink-0 transition-colors ${
+            dk('text-gray-600 hover:text-gray-300', 'text-gray-400 hover:text-gray-700')
+          }`}
+          title="Change musician"
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => removeShow(s.id)}
+          className="text-xs text-red-500 hover:text-red-400 shrink-0 transition-colors"
+          title="Remove show"
+        >
+          ×
+        </button>
+      </div>
+    )
+  }
+
   function renderMonth(year: number, month: number) {
     const monthKey   = `${year}-${String(month + 1).padStart(2, '0')}`
     const isOpen     = openMonths.has(monthKey)
     const isApproved = approvedMonths.has(monthKey)
     const grid       = getMonthGrid(year, month)
 
-    // All shows for this month (published + draft)
     const monthPublished = publishedShows.filter(s => s.date.startsWith(monthKey)).sort((a, b) => a.date.localeCompare(b.date))
     const monthDraft     = draftShows.filter(s => s.date.startsWith(monthKey)).sort((a, b) => a.date.localeCompare(b.date))
     const hasPending     = monthDraft.length > 0
@@ -130,8 +277,8 @@ export default function BookingCalendarTab({
 
         {/* Month header */}
         <div className={`px-4 py-3 ${dk('bg-gray-800', 'bg-gray-50')}`}>
-          <div className="flex items-start justify-between gap-3">
-            <p className={`font-semibold text-sm pt-0.5 ${dk('text-gray-100', 'text-gray-800')}`}>
+          <div className="flex items-center justify-between gap-3">
+            <p className={`font-semibold text-sm ${dk('text-gray-100', 'text-gray-800')}`}>
               {MONTH_NAMES[month]} {year}
               {hasPending && (
                 <span className="ml-2 text-xs font-normal text-orange-400">
@@ -139,7 +286,7 @@ export default function BookingCalendarTab({
                 </span>
               )}
             </p>
-          <label className="flex items-center gap-2 cursor-pointer select-none shrink-0">
+            <label className="flex items-center gap-2 cursor-pointer select-none shrink-0">
               <input
                 type="checkbox"
                 checked={isOpen}
@@ -170,9 +317,9 @@ export default function BookingCalendarTab({
           <div className="grid grid-cols-7 gap-y-0.5">
             {grid.map((day, i) => {
               if (!day) return <div key={i} />
-              const ds       = toDateStr(day)
-              const past     = ds < todayStr
-              const monOrFri = isMonOrFri(day)
+              const ds        = toDateStr(day)
+              const past      = ds < todayStr
+              const monOrFri  = isMonOrFri(day)
               const published = publishedByDate.get(ds)
               const draft     = draftByDate.get(ds)
               const show      = published ?? draft
@@ -183,7 +330,6 @@ export default function BookingCalendarTab({
               if (!monOrFri) {
                 cls += dk('text-gray-700', 'text-gray-300')
               } else if (isPending) {
-                // Draft/pending — orange
                 cls += past
                   ? dk('text-orange-900 bg-orange-900/10', 'text-orange-300 bg-orange-50')
                   : 'bg-orange-900/20 text-orange-300 font-bold ring-1 ring-orange-500/40'
@@ -224,48 +370,15 @@ export default function BookingCalendarTab({
 
           {/* Show list — published */}
           {monthPublished.length > 0 && (
-            <div className={`mt-3 pt-3 border-t space-y-1.5 ${dk('border-gray-800', 'border-gray-100')}`}>
-              {monthPublished.map(s => {
-                const d       = new Date(s.date + 'T00:00:00')
-                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]
-                const isPast  = s.date < todayStr
-                return (
-                  <div key={s.id} className={`flex items-baseline gap-2 ${isPast ? 'opacity-40' : ''}`}>
-                    <span className="text-xs text-amber-500 font-semibold shrink-0 tabular-nums w-14">
-                      {dayName} {d.getDate()}
-                    </span>
-                    <span className={`text-xs truncate ${dk('text-gray-300', 'text-gray-700')}`}>
-                      {s.artistName}
-                    </span>
-                    {s.featured && <span className="text-xs text-amber-500 shrink-0">★</span>}
-                  </div>
-                )
-              })}
+            <div className={`mt-3 pt-3 border-t space-y-2 ${dk('border-gray-800', 'border-gray-100')}`}>
+              {monthPublished.map(s => renderShowRow(s, 'amber'))}
             </div>
           )}
 
           {/* Show list — pending (draft) */}
           {monthDraft.length > 0 && (
-            <div className={`mt-3 pt-3 border-t space-y-1.5 ${dk('border-gray-800', 'border-gray-100')}`}>
-              {monthDraft.map(s => {
-                const d       = new Date(s.date + 'T00:00:00')
-                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]
-                return (
-                  <div key={s.id} className="flex items-baseline gap-2">
-                    <span className="text-xs text-orange-400 font-semibold shrink-0 tabular-nums w-14">
-                      {dayName} {d.getDate()}
-                    </span>
-                    <span className={`text-xs truncate ${dk('text-gray-300', 'text-gray-700')}`}>
-                      {s.artistName}
-                    </span>
-                    <span className={`text-xs shrink-0 px-1.5 py-0.5 rounded font-medium ${
-                      dk('bg-orange-900/40 text-orange-300', 'bg-orange-50 text-orange-600')
-                    }`}>
-                      Pending
-                    </span>
-                  </div>
-                )
-              })}
+            <div className={`mt-3 pt-3 border-t space-y-2 ${dk('border-gray-800', 'border-gray-100')}`}>
+              {monthDraft.map(s => renderShowRow(s, 'orange'))}
             </div>
           )}
 
@@ -304,7 +417,8 @@ export default function BookingCalendarTab({
       <p className={`text-sm leading-relaxed ${dk('text-gray-400', 'text-gray-600')}`}>
         <strong className={dk('text-gray-200', 'text-gray-800')}>Open for booking</strong> — musicians can self-book through the portal.
         Use <strong className={dk('text-gray-200', 'text-gray-800')}>Approve &amp; Publish</strong> on a month to push pending bookings live. Click again to unpublish.
-        Orange = pending approval · Amber = published · Green = open &amp; available.
+        Use <strong className={dk('text-gray-200', 'text-gray-800')}>Edit</strong> or <strong className={dk('text-gray-200', 'text-gray-800')}>×</strong> on any show to swap the musician or remove the date.
+        Orange = pending · Amber = published · Green = open &amp; available.
       </p>
 
       {/* Legend */}
@@ -343,8 +457,13 @@ export default function BookingCalendarTab({
           disabled={status === 'saving'}
           className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-semibold px-6 py-2.5 rounded text-sm transition-colors"
         >
-          {status === 'saving' ? 'Publishing…' : 'Publish Booking Settings'}
+          {status === 'saving' ? 'Publishing…' : 'Publish Changes'}
         </button>
+        {showsDirty && status === 'idle' && (
+          <span className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>
+            Unsaved show edits
+          </span>
+        )}
         {status === 'saved' && (
           <span className="text-green-500 text-sm">Published. Live in ~30 seconds.</span>
         )}

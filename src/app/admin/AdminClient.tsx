@@ -337,6 +337,7 @@ export default function AdminClient({
           {activeTab === 'calendar' && (
             <BookingCalendarTab
               shows={initialShows}
+              artists={initialArtists}
               initialOpenMonths={initialOpenMonths}
               initialApprovedMonths={initialApprovedMonths}
               password={password ?? ''}
