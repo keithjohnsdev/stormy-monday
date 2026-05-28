@@ -24,7 +24,7 @@ export default function UpcomingShows({ shows }: Props) {
             <p className="text-xs tracking-widest uppercase text-storm-gold mb-3">{upcomingShows.eyebrow}</p>
             <h2 className="font-display text-3xl text-storm-cream">{upcomingShows.heading}</h2>
           </div>
-          <Link href="/music" className="text-xs tracking-widest uppercase text-storm-muted hover:text-storm-gold transition-colors hidden sm:block">
+          <Link href="/events" className="text-xs tracking-widest uppercase text-storm-muted hover:text-storm-gold transition-colors hidden sm:block">
             {upcomingShows.scheduleLink}
           </Link>
         </div>
@@ -49,7 +49,7 @@ export default function UpcomingShows({ shows }: Props) {
           {shows.slice(0, 3).map((show, i) => (
             <FadeIn key={show.id} delay={i * 120}>
               <div className="relative bg-storm-card border border-storm-border overflow-hidden hover:border-storm-gold/50 hover:-translate-y-1 transition-all duration-300 group h-full cursor-pointer">
-                <Link href="/music" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
+                <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${show.artistName} on the shows page`} />
 
                 {/* Decorative corner accent */}
                 <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-storm-gold/30 transition-colors duration-300 group-hover:border-storm-gold/60" />
@@ -96,7 +96,7 @@ export default function UpcomingShows({ shows }: Props) {
       )}
 
       <div className="mt-8 text-center sm:hidden">
-        <Link href="/music" className="btn-outline text-xs">
+        <Link href="/events" className="btn-outline text-xs">
           {upcomingShows.scheduleLink}
         </Link>
       </div>
