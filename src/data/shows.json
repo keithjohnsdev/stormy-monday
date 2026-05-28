@@ -40,19 +40,5 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
-  },
-  {
-    "id": "1779947736101-4esy2",
-    "date": "2026-06-05",
-    "startTime": "9pm",
-    "artistId": "artist-keithjohns",
-    "artistName": "Keith Johns",
-    "genre": "Singer/Songwriter",
-    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
-    "artistWebsite": "https://www.keithjohnsmusic.com",
-    "ticketed": false,
-    "ticketLink": "",
-    "featured": false,
-    "status": "published"
   }
 ]
