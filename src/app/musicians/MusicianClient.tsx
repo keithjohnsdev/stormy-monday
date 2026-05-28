@@ -342,7 +342,7 @@ function CalendarTab({
       ) : (
         <>
           {/* Calendars */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {months.map(({ year, month }) => (
               <div key={`${year}-${month}`} className="bg-storm-dark border border-storm-border p-6">
                 {renderMonth(year, month)}
