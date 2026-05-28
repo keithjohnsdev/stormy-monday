@@ -341,21 +341,20 @@ export default function BookingCalendarTab({
 
           {/* Approve All / Unpublish */}
           <div className={`mt-4 pt-3 border-t ${dk('border-gray-800', 'border-gray-100')}`}>
-            {!isApproved && monthDraftCount > 0 && (
+            {!isApproved ? (
               <button
                 onClick={() => approveAllInMonth(monthKey)}
-                disabled={status === 'saving'}
-                className={`w-full py-2 text-xs font-semibold rounded transition-colors disabled:opacity-50 mb-2 ${
+                disabled={status === 'saving' || monthDraftCount === 0}
+                className={`w-full py-2 text-xs font-semibold rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
                   dk(
-                    'bg-emerald-900/20 text-emerald-400 hover:bg-emerald-900/40 border border-emerald-800/40',
-                    'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                    'bg-emerald-900/20 text-emerald-400 hover:enabled:bg-emerald-900/40 border border-emerald-800/40',
+                    'bg-emerald-50 text-emerald-700 hover:enabled:bg-emerald-100 border border-emerald-200'
                   )
                 }`}
               >
                 ✓ Approve All
               </button>
-            )}
-            {isApproved && (
+            ) : (
               <button
                 onClick={() => unpublishMonth(monthKey)}
                 disabled={status === 'saving'}
