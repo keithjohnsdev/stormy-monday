@@ -142,10 +142,9 @@ export default function BookingCalendarTab({
 
   function openModal(dateStr: string) {
     const show = publishedByDate.get(dateStr) ?? draftByDate.get(dateStr)
-    if (!show) return
     setSelectedDate(dateStr)
     setModalEditing(false)
-    setModalArtistId(show.artistId)
+    setModalArtistId(show?.artistId ?? artists[0]?.id ?? '')
   }
 
   function closeModal() {
@@ -192,6 +191,30 @@ export default function BookingCalendarTab({
     const show = publishedByDate.get(selectedDate) ?? draftByDate.get(selectedDate)
     if (!show) return
     const newShows = localShows.filter(s => s.id !== show.id)
+    setLocalShows(newShows)
+    closeModal()
+    await autoSave(newShows, openMonths, approvedMonths)
+  }
+
+  async function addShow() {
+    if (!selectedDate) return
+    const artist = artists.find(a => a.id === modalArtistId)
+    if (!artist) return
+    const newShow: StoredShow = {
+      id:            `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      date:          selectedDate,
+      startTime:     '9pm',
+      artistId:      artist.id,
+      artistName:    artist.name,
+      genre:         artist.genre,
+      description:   artist.description,
+      artistWebsite: artist.website || '',
+      ticketed:      false,
+      ticketLink:    '',
+      featured:      false,
+      status:        'published',
+    }
+    const newShows = [...localShows, newShow]
     setLocalShows(newShows)
     closeModal()
     await autoSave(newShows, openMonths, approvedMonths)
@@ -295,8 +318,9 @@ export default function BookingCalendarTab({
               const published = publishedByDate.get(ds)
               const draft     = draftByDate.get(ds)
               const show      = published ?? draft
-              const isPending = !published && !!draft
-              const clickable = !!show
+              const isPending  = !published && !!draft
+              const isOpenDate = monOrFri && !past && !show
+              const clickable  = !!show || isOpenDate
 
               let cls = 'h-8 flex items-center justify-center text-xs rounded relative '
               if (clickable) cls += 'cursor-pointer '
@@ -318,8 +342,8 @@ export default function BookingCalendarTab({
                 cls += dk('text-gray-600', 'text-gray-400')
               } else {
                 cls += dk(
-                  'bg-gray-700/30 text-gray-400 font-semibold ring-1 ring-gray-600/40',
-                  'bg-gray-100 text-gray-500 font-semibold ring-1 ring-gray-300'
+                  'bg-gray-700/30 text-gray-400 font-semibold ring-1 ring-gray-600/40 hover:ring-gray-500/60 hover:text-gray-300',
+                  'bg-gray-100 text-gray-500 font-semibold ring-1 ring-gray-300 hover:ring-gray-400 hover:text-gray-700'
                 )
               }
 
@@ -329,9 +353,9 @@ export default function BookingCalendarTab({
                   className={cls}
                   onClick={clickable ? () => openModal(ds) : undefined}
                   title={
-                    isPending ? `Pending: ${draft!.artistName} — click to edit`
-                    : show     ? `${show.artistName} — click to edit`
-                    : monOrFri && !past ? 'Open'
+                    isPending    ? `Pending: ${draft!.artistName} — click to edit`
+                    : show       ? `${show.artistName} — click to edit`
+                    : isOpenDate ? 'Open — click to book'
                     : undefined
                   }
                 >
@@ -437,7 +461,7 @@ export default function BookingCalendarTab({
       </div>
 
       {/* Date detail modal */}
-      {selectedDate && modalShow && (
+      {selectedDate && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4"
           onClick={e => { if (e.target === e.currentTarget) closeModal() }}
@@ -458,32 +482,25 @@ export default function BookingCalendarTab({
               ×
             </button>
 
-            {/* Date + status */}
+            {/* Date heading */}
             <div>
               <p className={`text-xs uppercase tracking-widest mb-1.5 ${
-                isPendingModal ? 'text-amber-400' : 'text-emerald-500'
+                !modalShow ? dk('text-gray-400', 'text-gray-500')
+                : isPendingModal ? 'text-amber-400'
+                : 'text-emerald-500'
               }`}>
-                {isPendingModal ? 'Pending Approval' : 'Published'}
+                {!modalShow ? 'Open Date' : isPendingModal ? 'Pending Approval' : 'Published'}
               </p>
               <p className={`font-semibold text-base ${dk('text-gray-100', 'text-gray-900')}`}>
                 {formatAdminDate(selectedDate)}
               </p>
             </div>
 
-            {/* Artist info or edit dropdown */}
-            {!modalEditing ? (
-              <div className={`border rounded-md p-4 ${dk('border-gray-700 bg-gray-800/50', 'border-gray-200 bg-gray-50')}`}>
-                <p className={`font-semibold text-sm mb-0.5 ${dk('text-gray-100', 'text-gray-900')}`}>
-                  {modalShow.artistName}
-                </p>
-                {modalShow.genre && (
-                  <p className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>{modalShow.genre}</p>
-                )}
-              </div>
-            ) : (
+            {/* ── ADD MODE (no existing show) ── */}
+            {!modalShow && (
               <div className="grid gap-3">
                 <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>
-                  Change musician
+                  Select musician
                 </p>
                 <select
                   value={modalArtistId}
@@ -498,15 +515,15 @@ export default function BookingCalendarTab({
                 </select>
                 <div className="flex gap-2">
                   <button
-                    onClick={confirmModalEdit}
-                    disabled={status === 'saving'}
-                    className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
+                    onClick={addShow}
+                    disabled={status === 'saving' || !modalArtistId}
+                    className="flex-1 py-2.5 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
                   >
-                    {status === 'saving' ? 'Saving…' : 'Save Change'}
+                    {status === 'saving' ? 'Booking…' : 'Book Show'}
                   </button>
                   <button
-                    onClick={() => setModalEditing(false)}
-                    className={`flex-1 py-2 text-sm rounded border transition-colors ${
+                    onClick={closeModal}
+                    className={`flex-1 py-2.5 text-sm rounded border transition-colors ${
                       dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')
                     }`}
                   >
@@ -516,49 +533,100 @@ export default function BookingCalendarTab({
               </div>
             )}
 
-            {/* Actions */}
-            {!modalEditing && (
-              <div className="grid gap-2 pt-1">
-                {isPendingModal && (
-                  <button
-                    onClick={approveShow}
-                    disabled={status === 'saving'}
-                    className={`w-full py-2.5 text-sm font-semibold rounded border transition-colors disabled:opacity-50 ${
-                      dk(
-                        'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/40',
-                        'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                      )
-                    }`}
-                  >
-                    {status === 'saving' ? 'Approving…' : '✓ Approve'}
-                  </button>
+            {/* ── VIEW / EDIT MODE (existing show) ── */}
+            {modalShow && (
+              <>
+                {/* Artist info or edit dropdown */}
+                {!modalEditing ? (
+                  <div className={`border rounded-md p-4 ${dk('border-gray-700 bg-gray-800/50', 'border-gray-200 bg-gray-50')}`}>
+                    <p className={`font-semibold text-sm mb-0.5 ${dk('text-gray-100', 'text-gray-900')}`}>
+                      {modalShow.artistName}
+                    </p>
+                    {modalShow.genre && (
+                      <p className={`text-xs ${dk('text-gray-400', 'text-gray-500')}`}>{modalShow.genre}</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid gap-3">
+                    <p className={`text-xs uppercase tracking-widest ${dk('text-gray-400', 'text-gray-500')}`}>
+                      Change musician
+                    </p>
+                    <select
+                      value={modalArtistId}
+                      onChange={e => setModalArtistId(e.target.value)}
+                      className={`w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+                        dk('bg-gray-800 border-gray-600 text-gray-100', 'bg-white border-gray-300 text-gray-800')
+                      }`}
+                    >
+                      {artists.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))}
+                    </select>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={confirmModalEdit}
+                        disabled={status === 'saving'}
+                        className="flex-1 py-2 text-sm font-semibold rounded bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white transition-colors"
+                      >
+                        {status === 'saving' ? 'Saving…' : 'Save Change'}
+                      </button>
+                      <button
+                        onClick={() => setModalEditing(false)}
+                        className={`flex-1 py-2 text-sm rounded border transition-colors ${
+                          dk('border-gray-600 text-gray-400 hover:text-gray-200', 'border-gray-300 text-gray-500 hover:text-gray-800')
+                        }`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 )}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setModalEditing(true)}
-                    className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
-                      dk(
-                        'border-gray-600 text-gray-300 hover:text-white hover:border-gray-400',
-                        'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500'
-                      )
-                    }`}
-                  >
-                    Edit Musician
-                  </button>
-                  <button
-                    onClick={removeModalShow}
-                    disabled={status === 'saving'}
-                    className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${
-                      dk(
-                        'border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700',
-                        'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300'
-                      )
-                    }`}
-                  >
-                    Remove Show
-                  </button>
-                </div>
-              </div>
+
+                {/* Actions */}
+                {!modalEditing && (
+                  <div className="grid gap-2 pt-1">
+                    {isPendingModal && (
+                      <button
+                        onClick={approveShow}
+                        disabled={status === 'saving'}
+                        className={`w-full py-2.5 text-sm font-semibold rounded border transition-colors disabled:opacity-50 ${
+                          dk(
+                            'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/40',
+                            'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                          )
+                        }`}
+                      >
+                        {status === 'saving' ? 'Approving…' : '✓ Approve'}
+                      </button>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setModalEditing(true)}
+                        className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors ${
+                          dk(
+                            'border-gray-600 text-gray-300 hover:text-white hover:border-gray-400',
+                            'border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-500'
+                          )
+                        }`}
+                      >
+                        Edit Musician
+                      </button>
+                      <button
+                        onClick={removeModalShow}
+                        disabled={status === 'saving'}
+                        className={`flex-1 py-2.5 text-sm font-medium rounded border transition-colors disabled:opacity-50 ${
+                          dk(
+                            'border-red-800/50 text-red-400 hover:bg-red-900/20 hover:border-red-700',
+                            'border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300'
+                          )
+                        }`}
+                      >
+                        Remove Show
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
