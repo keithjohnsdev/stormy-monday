@@ -8,7 +8,7 @@
     "defaultCoverCharge": "Free",
     "email": "keithjohnsmusic@gmail.com",
     "password": "kjstormy",
-    "imageUrl": "/images/artists/1779981809666.jpg"
+    "imageUrl": "/images/artists/artist-keithjohns/photo.jpg"
   },
   {
     "id": "artist-alejandro-elizondo",
@@ -19,7 +19,7 @@
     "defaultCoverCharge": "Free",
     "email": "",
     "password": "",
-    "imageUrl": "/images/artists/alejandro-elizondo.jpg"
+    "imageUrl": "/images/artists/artist-alejandro-elizondo/photo.jpg"
   },
   {
     "id": "artist-oigo",
@@ -30,7 +30,7 @@
     "defaultCoverCharge": "Free",
     "email": "",
     "password": "",
-    "imageUrl": "/images/artists/oigo.png"
+    "imageUrl": "/images/artists/artist-oigo/photo.jpg"
   },
   {
     "id": "artist-carlos-tramora",
