@@ -34,10 +34,7 @@ export default function UpcomingShows({ shows, events }: Props) {
       .filter(e => e.date >= todayStr)
       .map(e => ({ kind: 'event' as const, id: e.id, date: e.date, featured: e.featured ?? false, data: e })),
   ]
-    .sort((a, b) => {
-      if (a.featured !== b.featured) return a.featured ? -1 : 1
-      return a.date.localeCompare(b.date)
-    })
+    .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 3)
 
   const cardEl = (card: HomeCard, i: number) => {
