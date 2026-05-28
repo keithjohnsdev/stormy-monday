@@ -2,11 +2,12 @@
 
 import { useState } from 'react'
 import type { Artist } from '@/types'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
 const emptyArtist = (): Omit<Artist, 'id'> => ({
-  name: '', genre: '', description: '', website: '', defaultCoverCharge: 'Free', email: '', password: '',
+  name: '', genre: '', description: '', website: '', defaultCoverCharge: 'Free', email: '', password: '', imageUrl: '',
 })
 
 interface Props {
@@ -176,6 +177,16 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
                   Portal credentials let this artist log in at /musicians to self-book shows.
                   Leave blank to disable portal access.
                 </p>
+                <div className={`border-t pt-3 ${d('border-gray-700', 'border-gray-200')}`}>
+                  <label className={`${labelCls} mb-2`}>Artist Photo</label>
+                  <ImageUpload
+                    value={editForm.imageUrl ?? ''}
+                    folder="artists"
+                    password={password}
+                    isDark={isDark}
+                    onChange={url => setEditForm(f => f ? { ...f, imageUrl: url } : f)}
+                  />
+                </div>
                 <button
                   onClick={saveEdit}
                   disabled={!editForm.name.trim()}
@@ -245,6 +256,16 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
                 onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="Optional — enables /musicians login" className={inputCls} />
             </div>
+          </div>
+          <div className={`border-t pt-3 ${d('border-gray-700', 'border-gray-200')}`}>
+            <label className={`${labelCls} mb-2`}>Artist Photo</label>
+            <ImageUpload
+              value={addForm.imageUrl ?? ''}
+              folder="artists"
+              password={password}
+              isDark={isDark}
+              onChange={url => setAddForm(f => ({ ...f, imageUrl: url }))}
+            />
           </div>
           <button onClick={addArtist} disabled={!addForm.name.trim()}
             className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white font-semibold px-5 py-2 rounded text-sm transition-colors w-fit">

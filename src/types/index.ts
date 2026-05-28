@@ -36,6 +36,7 @@ export interface CalendarEvent {
   ticketed?: boolean
   ticketLink?: string
   featured?: boolean
+  imageUrl?: string     // /images/events/xxx.jpg
 }
 
 export interface Artist {
@@ -48,6 +49,8 @@ export interface Artist {
   /** Musician portal login credentials — set by admin, optional */
   email?: string
   password?: string
+  /** Photo stored in public/images/artists/ — /images/artists/xxx.jpg */
+  imageUrl?: string
 }
 
 export interface StoredShow extends Show {

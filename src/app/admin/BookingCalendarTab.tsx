@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Artist, StoredShow, CalendarEvent } from '@/types'
+import ImageUpload from '@/components/admin/ImageUpload'
 
 // ─── Calendar helpers ──────────────────────────────────────────────────────────
 
@@ -81,6 +82,7 @@ export default function BookingCalendarTab({
   const [modalEventTicketed,    setModalEventTicketed]    = useState(false)
   const [modalEventTicketLink,  setModalEventTicketLink]  = useState('')
   const [modalEventFeatured,    setModalEventFeatured]    = useState(false)
+  const [modalEventImageUrl,    setModalEventImageUrl]    = useState('')
 
   const now      = new Date()
   const todayStr = toDateStr(now)
@@ -200,6 +202,7 @@ export default function BookingCalendarTab({
       setModalEventTicketed(event?.ticketed ?? false)
       setModalEventTicketLink(event?.ticketLink ?? '')
       setModalEventFeatured(event?.featured ?? false)
+      setModalEventImageUrl(event?.imageUrl ?? '')
     }
   }
 
@@ -211,6 +214,7 @@ export default function BookingCalendarTab({
     setModalTicketed(false); setModalFeatured(false); setModalTicketLink('')
     setModalEventName(''); setModalEventTime('9pm'); setModalEventDesc('')
     setModalEventTicketed(false); setModalEventTicketLink(''); setModalEventFeatured(false)
+    setModalEventImageUrl('')
   }
 
   // ── Show modal actions ───────────────────────────────────────────────────────
@@ -269,6 +273,7 @@ export default function BookingCalendarTab({
       genre:         artist.genre,
       description:   artist.description,
       artistWebsite: artist.website || '',
+      artistPhoto:   artist.imageUrl ?? '',
       ticketed:      modalTicketed,
       ticketLink:    modalTicketed ? modalTicketLink.trim() : '',
       featured:      modalFeatured,
@@ -292,12 +297,13 @@ export default function BookingCalendarTab({
       newEvents = localEvents.map(e =>
         e.id !== existing.id ? e : {
           ...e,
-          name:       modalEventName.trim(),
-          startTime:  modalEventTime.trim() || '9pm',
+          name:        modalEventName.trim(),
+          startTime:   modalEventTime.trim() || '9pm',
           description: modalEventDesc.trim() || undefined,
-          ticketed:   modalEventTicketed,
-          ticketLink: modalEventTicketed ? modalEventTicketLink.trim() : '',
-          featured:   modalEventFeatured,
+          ticketed:    modalEventTicketed,
+          ticketLink:  modalEventTicketed ? modalEventTicketLink.trim() : '',
+          featured:    modalEventFeatured,
+          imageUrl:    modalEventImageUrl || undefined,
         }
       )
     } else {
@@ -311,6 +317,7 @@ export default function BookingCalendarTab({
         ticketed:    modalEventTicketed,
         ticketLink:  modalEventTicketed ? modalEventTicketLink.trim() : '',
         featured:    modalEventFeatured,
+        imageUrl:    modalEventImageUrl || undefined,
       }
       newEvents = [...localEvents, newEvent].sort((a, b) => a.date.localeCompare(b.date))
     }
@@ -720,6 +727,16 @@ export default function BookingCalendarTab({
                 <div>
                   <label className={`text-xs uppercase tracking-widest block mb-1.5 ${dk('text-gray-400', 'text-gray-500')}`}>Description <span className={dk('text-gray-600', 'text-gray-400')}>(optional)</span></label>
                   <textarea rows={2} placeholder="Short description…" value={modalEventDesc} onChange={e => setModalEventDesc(e.target.value)} className={`${inputCls} resize-none`} />
+                </div>
+                <div>
+                  <label className={`text-xs uppercase tracking-widest block mb-2 ${dk('text-gray-400', 'text-gray-500')}`}>Photo <span className={dk('text-gray-600', 'text-gray-400')}>(optional)</span></label>
+                  <ImageUpload
+                    value={modalEventImageUrl || undefined}
+                    folder="events"
+                    password={password}
+                    isDark={isDark}
+                    onChange={url => setModalEventImageUrl(url)}
+                  />
                 </div>
                 <div className="flex items-center gap-5">
                   <label className="flex items-center gap-2 cursor-pointer select-none">

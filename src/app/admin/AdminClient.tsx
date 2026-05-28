@@ -319,17 +319,9 @@ export default function AdminClient({
     <ThemeCtx.Provider value={isDark}>
       <div className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
 
-        <div className={`border-b sticky top-0 z-10 transition-colors duration-500 ${
-          isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-        }`}>
-          <div className="max-w-3xl mx-auto px-6 pt-4 flex items-center justify-between">
-            <div>
-              <p className={`text-xs uppercase tracking-widest ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Stormy Monday</p>
-              <h1 className={`font-bold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Admin</h1>
-            </div>
-            {activeTab === 'content' && <SaveButton />}
-          </div>
-          <div className="max-w-3xl mx-auto px-6 flex items-center justify-between mt-3">
+        <div className="max-w-3xl mx-auto px-6 pt-24 pb-8 grid gap-4">
+
+          <div className={`flex items-center justify-between border-b pb-1 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
             <div className="flex gap-1">
               {(['content', 'artists', 'shows', 'calendar'] as Tab[]).map(t => (
                 <button
@@ -349,9 +341,6 @@ export default function AdminClient({
               <ThemeToggle isDark={isDark} onChange={applyTheme} />
             </div>
           </div>
-        </div>
-
-        <div className="max-w-3xl mx-auto px-6 pt-10 pb-8 grid gap-4">
 
           {activeTab === 'artists' && (
             <ArtistsTab initialArtists={initialArtists} password={password ?? ''} isDark={isDark} />

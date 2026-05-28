@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { CalendarEvent } from '@/types'
 
@@ -20,17 +21,26 @@ export default function CalendarEventCard({ event }: Props) {
     <article className="relative bg-storm-card border border-storm-border hover:border-storm-gold transition-colors group cursor-pointer">
       <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${event.name}`} />
 
-      {/* Decorative header */}
+      {/* Photo / decorative header */}
       <div className="aspect-[4/3] bg-storm-dark relative overflow-hidden flex items-center justify-center">
-        <span className="font-display text-6xl text-storm-border group-hover:text-storm-border/70 transition-colors select-none">
-          ✦
-        </span>
+        {event.imageUrl ? (
+          <Image
+            src={event.imageUrl}
+            alt={event.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <span className="font-display text-6xl text-storm-border group-hover:text-storm-border/70 transition-colors select-none">
+            ✦
+          </span>
+        )}
         {event.featured && (
-          <div className="absolute top-3 left-3 bg-storm-gold text-storm-black text-xs px-2 py-1 font-semibold tracking-wider uppercase">
+          <div className="absolute top-3 left-3 bg-storm-gold text-storm-black text-xs px-2 py-1 font-semibold tracking-wider uppercase z-10">
             Featured
           </div>
         )}
-        <div className="absolute top-3 right-3 bg-storm-black/70 text-storm-muted text-xs px-2 py-1 tracking-widest uppercase">
+        <div className="absolute top-3 right-3 bg-storm-black/70 text-storm-muted text-xs px-2 py-1 tracking-widest uppercase z-10">
           Special Event
         </div>
       </div>
