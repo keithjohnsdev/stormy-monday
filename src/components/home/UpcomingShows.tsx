@@ -56,7 +56,7 @@ export default function UpcomingShows({ shows, events }: Props) {
 
     return (
       <FadeIn key={card.id} delay={i * 120}>
-        <div className="relative bg-storm-card border border-storm-border overflow-hidden hover:border-storm-gold/50 hover:-translate-y-1 transition-all duration-300 group h-full cursor-pointer">
+        <div className="relative bg-storm-card border border-storm-border overflow-hidden hover:border-storm-gold/50 hover:-translate-y-1 transition-all duration-300 group h-full cursor-pointer flex flex-col">
           <Link href="/events" className="absolute inset-0 z-0" aria-label={`View ${title}`} />
 
           {card.featured && (
@@ -68,7 +68,7 @@ export default function UpcomingShows({ shows, events }: Props) {
           {/* Decorative corner accent */}
           <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-storm-gold/30 transition-colors duration-300 group-hover:border-storm-gold/60" />
 
-          <div className="p-6">
+          <div className="p-6 flex flex-col flex-1">
             <p className="text-xs tracking-widest uppercase text-storm-gold mb-3">
               {formatDate(card.date)}
             </p>
@@ -79,7 +79,7 @@ export default function UpcomingShows({ shows, events }: Props) {
             {desc && (
               <p className="text-storm-muted text-sm mb-3 line-clamp-2">{desc}</p>
             )}
-            <div className="flex items-center justify-between pt-2 border-t border-storm-border/60">
+            <div className="flex items-center justify-between pt-2 border-t border-storm-border/60 mt-auto">
               <span className="text-xs text-storm-muted">
                 {time}
                 {charge && ` · ${charge}`}
