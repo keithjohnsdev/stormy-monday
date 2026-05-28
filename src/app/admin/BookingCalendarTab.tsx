@@ -607,11 +607,8 @@ export default function BookingCalendarTab({
 
       {/* ── Modal ────────────────────────────────────────────────────────────── */}
       {selectedDate && modalMode && (
-        <div
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          onClick={e => { if (e.target === e.currentTarget) closeModal() }}
-        >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
 
           <div className={`relative w-full max-w-sm rounded-lg shadow-2xl border p-6 grid gap-5 ${
             dk('bg-gray-900 border-gray-700', 'bg-white border-gray-200')
