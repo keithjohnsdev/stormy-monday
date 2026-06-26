@@ -102,7 +102,7 @@
     "ticketed": false,
     "ticketLink": "",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   },
   {
     "id": "1782484273326-nc5hx",
@@ -117,7 +117,7 @@
     "ticketed": false,
     "ticketLink": "",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   },
   {
     "id": "1782484278729-n6els",
@@ -132,7 +132,7 @@
     "ticketed": false,
     "ticketLink": "",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   },
   {
     "id": "1782484282354-ru3o6",
@@ -147,6 +147,6 @@
     "ticketed": false,
     "ticketLink": "",
     "featured": false,
-    "status": "draft"
+    "status": "published"
   }
 ]
