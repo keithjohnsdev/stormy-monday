@@ -10,16 +10,16 @@
    Brand palette:  After Dark #5E4943 · Miami Green #193326 · Dade Gold #97793F
                    Sunburnt Orange #8F381E · Stormy Blue #08242E
 
-   Surfaces use a warm brown ramp (drawn from After Dark) so the room reads warm
-   and welcoming; Dade Gold is the primary accent and the named brand colors live
-   as accents.
+   Surfaces use a deep green near-black ramp (toned toward Miami Green) so the
+   room reads moody and verdant; Dade Gold is the primary accent and the named
+   brand colors live as accents.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Warm near-black surface ramp */
-  --storm-black:       20 16 14;       /* #14100e — page bg (warm near-black) */
-  --storm-dark:        30 24 20;       /* #1e1814 — section bg */
-  --storm-card:        42 33 27;       /* #2a211b — card bg */
-  --storm-border:      60 47 38;       /* #3c2f26 — borders */
+  /* Deep green near-black surface ramp — toned toward Miami Green */
+  --storm-black:       14 20 15;       /* #0e140f — page bg (green near-black) */
+  --storm-dark:        20 30 22;       /* #141e16 — section bg */
+  --storm-card:        27 42 31;       /* #1b2a1f — card bg */
+  --storm-border:      38 60 44;       /* #263c2c — borders */
 
   /* Accents */
   --storm-gold:        151 121 63;     /* #97793f — Dade Gold, primary accent */
