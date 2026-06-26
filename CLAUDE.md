@@ -57,10 +57,12 @@ Palette follows the 2025 Brand Guidelines (Apartment 302 Creative). Surfaces use
 
 James uses `/admin` to update site content, manage the artist roster, and schedule shows. The panel is password-protected (`ADMIN_PASSWORD` env var). On save, it commits changes directly to GitHub via the API, which triggers a Vercel redeploy (~30 seconds to go live).
 
-Three tabs:
+Tabs:
 - **Content** — all site text (same fields as `src/content/index.ts`)
 - **Artists** — artist roster stored in `src/data/artists.json`
 - **Shows** — show schedule stored in `src/data/shows.json`
+- **Calendar** — booking calendar / open months (`src/data/booking-config.json` + `events.json`)
+- **Hero Photos** — landing-page hero slideshow images. Adds/removes image files in `public/images/hero/` via the GitHub Contents API (`/api/hero-photos`, GET/POST/DELETE). The slideshow shows every image in that folder, sorted by filename (`src/lib/heroImages.ts`).
 
 ## Music Schedule
 

@@ -6,10 +6,19 @@ import type { Artist, StoredShow, CalendarEvent } from '@/types'
 import ArtistsTab from './ArtistsTab'
 import ShowsTab from './ShowsTab'
 import BookingCalendarTab from './BookingCalendarTab'
+import HeroPhotosTab from './HeroPhotosTab'
 
 type ContentData = typeof content
 type Status = 'idle' | 'saving' | 'saved' | 'error'
-type Tab = 'content' | 'artists' | 'shows' | 'calendar'
+type Tab = 'content' | 'artists' | 'shows' | 'calendar' | 'hero'
+
+const TAB_LABELS: Record<Tab, string> = {
+  content: 'content',
+  artists: 'artists',
+  shows: 'shows',
+  calendar: 'calendar',
+  hero: 'hero photos',
+}
 
 const SESSION_KEY  = 'sm_admin_pw'
 const THEME_KEY    = 'sm_admin_theme'
@@ -323,7 +332,7 @@ export default function AdminClient({
 
           <div className={`flex items-center justify-between border-b pb-1 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
             <div className="flex gap-1">
-              {(['content', 'artists', 'shows', 'calendar'] as Tab[]).map(t => (
+              {(['content', 'artists', 'shows', 'calendar', 'hero'] as Tab[]).map(t => (
                 <button
                   key={t}
                   onClick={() => setActiveTab(t)}
@@ -333,7 +342,7 @@ export default function AdminClient({
                       : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-100' : 'text-gray-500 hover:text-gray-800'}`
                   }`}
                 >
-                  {t}
+                  {TAB_LABELS[t]}
                 </button>
               ))}
             </div>
@@ -357,6 +366,14 @@ export default function AdminClient({
               initialEvents={initialEvents}
               initialOpenMonths={initialOpenMonths}
               initialApprovedMonths={initialApprovedMonths}
+              password={password ?? ''}
+              isDark={isDark}
+              onAuthError={() => { sessionStorage.removeItem(SESSION_KEY); setPassword(null) }}
+            />
+          )}
+
+          {activeTab === 'hero' && (
+            <HeroPhotosTab
               password={password ?? ''}
               isDark={isDark}
               onAuthError={() => { sessionStorage.removeItem(SESSION_KEY); setPassword(null) }}
