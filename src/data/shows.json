@@ -103,5 +103,20 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
+  },
+  {
+    "id": "1782484273326-nc5hx",
+    "date": "2026-07-10",
+    "startTime": "9pm",
+    "artistId": "artist-alejandro-elizondo",
+    "artistName": "Alejandro Elizondo",
+    "genre": "Folk / Americana / Soul",
+    "description": "Miami-based singer-songwriter and multi-instrumentalist rooted in folk, soul, and Americana. A core member of The Wynwood String Band, he has been a fixture of Miami's independent music scene at venues like the Wynwood Yard and the Miami Folk & Indie Festival. His music blends acoustic warmth with heartfelt songwriting that connects naturally with live audiences.",
+    "artistWebsite": "https://www.instagram.com/alejandroelizondomusic/",
+    "artistPhoto": "/images/artists/artist-alejandro-elizondo/photo.jpg",
+    "ticketed": false,
+    "ticketLink": "",
+    "featured": false,
+    "status": "published"
   }
 ]
