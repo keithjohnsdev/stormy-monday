@@ -3,18 +3,37 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   THEME COLORS — Update these R G B channel values when Pantones arrive.
-   Format is "R G B" (no commas, no #) so Tailwind opacity modifiers work.
+   THEME COLORS — Stormy Monday brand palette (2025 Brand Guidelines,
+   Apartment 302 Creative). Format is "R G B" (no commas, no #) so Tailwind
+   opacity modifiers work.
+
+   Brand palette:  After Dark #5E4943 · Miami Green #193326 · Dade Gold #97793F
+                   Sunburnt Orange #8F381E · Stormy Blue #08242E
+
+   Surfaces are built from the brand's Stormy Blue, lifted layer by layer into a
+   deep teal ramp — so the main background IS a brand color and the room reads
+   richer and less dark than flat black. Warm brand colors live as accents.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --storm-black:       13 11 9;        /* #0d0b09 — page bg */
-  --storm-dark:        26 22 18;       /* #1a1612 — section bg */
-  --storm-card:        33 29 24;       /* #211d18 — card bg */
-  --storm-gold:        196 154 74;     /* #c49a4a — primary accent */
-  --storm-gold-light:  212 176 106;    /* #d4b06a — hover state */
-  --storm-cream:       240 235 227;    /* #f0ebe3 — primary text */
-  --storm-muted:       122 112 104;    /* #7a7068 — secondary text */
-  --storm-border:      46 40 32;       /* #2e2820 — borders */
+  /* Brand teal surface ramp — built up from Stormy Blue #08242E, lifted for lightness */
+  --storm-black:       8 36 46;        /* #08242e — page bg (Stormy Blue) */
+  --storm-dark:        14 48 56;       /* #0e3038 — section bg (lifted teal) */
+  --storm-card:        22 62 68;       /* #163e44 — card bg (raised teal) */
+  --storm-border:      44 81 89;       /* #2c5159 — borders */
+
+  /* Accents */
+  --storm-gold:        151 121 63;     /* #97793f — Dade Gold, primary accent */
+  --storm-gold-light:  189 154 90;     /* #bd9a5a — Dade Gold tint, hover state */
+
+  /* Text */
+  --storm-cream:       242 237 228;    /* #f2ede4 — primary text (warm cream) */
+  --storm-muted:       160 143 125;    /* #a08f7d — secondary text (warm, inviting) */
+
+  /* Brand accent colors */
+  --storm-brown:       94 73 67;       /* #5e4943 — After Dark */
+  --storm-green:       25 51 38;       /* #193326 — Miami Green */
+  --storm-orange:      143 56 30;      /* #8f381e — Sunburnt Orange */
+  --storm-blue:        8 36 46;        /* #08242e — Stormy Blue */
 }
 
 @layer base {

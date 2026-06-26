@@ -44,7 +44,7 @@ function LockScreen({ onUnlock, error }: { onUnlock: (pw: string) => void; error
     >
       <div className="absolute inset-0 bg-black/55" />
       <div className="relative z-10 w-full max-w-sm text-center">
-        <h1 className="font-display text-6xl sm:text-7xl text-storm-gold mb-5 leading-tight uppercase tracking-widest [text-shadow:0_0_40px_rgba(196,154,74,0.6),0_2px_16px_rgba(0,0,0,1)]">
+        <h1 className="font-display text-6xl sm:text-7xl text-storm-gold mb-5 leading-tight uppercase tracking-widest [text-shadow:0_0_40px_rgba(151,121,63,0.6),0_2px_16px_rgba(0,0,0,1)]">
           YOU SHALL NOT PASS!
         </h1>
         <p className="text-storm-muted text-sm mb-10 uppercase tracking-[0.3em] [text-shadow:0_1px_6px_rgba(0,0,0,0.9)]">
