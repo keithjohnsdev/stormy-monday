@@ -16,13 +16,13 @@ Next.js 16 website for Stormy Monday, a cocktail bar and music venue at 820 Alto
 
 ## Color Tokens
 
-Palette follows the 2025 Brand Guidelines (Apartment 302 Creative). Surfaces use a deep green near-black ramp (toned toward Miami Green) so the room reads moody and verdant; Dade Gold is the primary accent and the named brand colors live as accents. Values are defined as RGB channels in `src/app/globals.css` and exposed via `tailwind.config.ts`.
+Palette follows the 2025 Brand Guidelines (Apartment 302 Creative). The page background is a warm near-black; sections and cards use a deep green ramp (toned toward Miami Green). Dade Gold is the primary accent and the named brand colors live as accents. Values are defined as RGB channels in `src/app/globals.css` and exposed via `tailwind.config.ts`.
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `storm-black` | `#0e140f` | Page background (green near-black) |
-| `storm-dark` | `#141e16` | Section backgrounds |
-| `storm-card` | `#1b2a1f` | Card backgrounds |
+| `storm-black` | `#14100e` | Page background (warm near-black) |
+| `storm-dark` | `#141e16` | Section backgrounds (deep green) |
+| `storm-card` | `#141e16` | Card backgrounds (matches section bg) |
 | `storm-border` | `#263c2c` | Borders, dividers |
 | `storm-gold` | `#97793f` | Dade Gold — primary accent, CTAs |
 | `storm-gold-light` | `#bd9a5a` | Dade Gold tint — hover state |

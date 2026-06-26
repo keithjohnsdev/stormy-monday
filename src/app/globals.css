@@ -15,10 +15,10 @@
    brand colors live as accents.
    ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Deep green near-black surface ramp — toned toward Miami Green */
-  --storm-black:       14 20 15;       /* #0e140f — page bg (green near-black) */
-  --storm-dark:        20 30 22;       /* #141e16 — section bg */
-  --storm-card:        27 42 31;       /* #1b2a1f — card bg */
+  /* Warm near-black page bg with a deep green section/card ramp */
+  --storm-black:       20 16 14;       /* #14100e — page bg (warm near-black) */
+  --storm-dark:        20 30 22;       /* #141e16 — section bg (deep green) */
+  --storm-card:        20 30 22;       /* #141e16 — card bg (matches InfoStrip section bg) */
   --storm-border:      38 60 44;       /* #263c2c — borders */
 
   /* Accents */
