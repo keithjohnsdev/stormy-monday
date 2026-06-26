@@ -435,7 +435,7 @@ export default function BookingCalendarTab({
                 if (isPending) {
                   cls += past
                     ? dk('text-amber-900 bg-amber-900/10', 'text-amber-700 bg-amber-50')
-                    : 'bg-amber-900/20 text-amber-300 font-bold ring-1 ring-amber-500/40'
+                    : 'bg-amber-500/20 text-amber-300 font-bold ring-1 ring-amber-500/40'
                   if (!past) cls += ' hover:ring-2 hover:ring-amber-400/60'
                 } else if (published && past) {
                   cls += dk('text-emerald-800 bg-emerald-900/20', 'text-emerald-700 bg-emerald-50')
@@ -557,7 +557,7 @@ export default function BookingCalendarTab({
             Published
           </span>
           <span className="flex items-center gap-1.5">
-            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-900/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
+            <span className={`w-5 h-5 rounded flex-shrink-0 ring-1 ${dk('bg-amber-500/20 ring-amber-500/40', 'bg-amber-50 ring-amber-200')}`} />
             Pending approval
           </span>
           <span className="flex items-center gap-1.5">
