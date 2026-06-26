@@ -133,5 +133,20 @@
     "ticketLink": "",
     "featured": false,
     "status": "published"
+  },
+  {
+    "id": "1782484282354-ru3o6",
+    "date": "2026-07-17",
+    "startTime": "9pm",
+    "artistId": "artist-carlos-tramora",
+    "artistName": "Carlos Tramora",
+    "genre": "Live Music",
+    "description": "Miami-based musician and live performer.",
+    "artistWebsite": "",
+    "artistPhoto": "",
+    "ticketed": false,
+    "ticketLink": "",
+    "featured": false,
+    "status": "published"
   }
 ]
