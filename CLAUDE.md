@@ -59,7 +59,7 @@ James uses `/admin` to update site content, manage the artist roster, and schedu
 
 Tabs:
 - **Content** — all site text (same fields as `src/content/index.ts`)
-- **Artists** — artist roster stored in `src/data/artists.json`
+- **Artists** — artist roster stored in `src/data/artists.json`. Includes an "Invite a musician" box: enter an email to generate a signed self-signup link (`/artist-signup?token=…`, valid 7 days, `src/lib/invite.ts`). The musician opens it, fills out their profile at `/artist-signup`, and `POST /api/artist-signup` appends them to the roster via the GitHub API (with a generated portal password). `POST /api/artist-invite` emails the link via Resend (`RESEND_API_KEY`); if Resend isn't configured or a send fails, the admin panel falls back to showing a copy-able link.
 - **Shows** — show schedule stored in `src/data/shows.json`
 - **Calendar** — booking calendar / open months (`src/data/booking-config.json` + `events.json`)
 - **Hero Photos** — landing-page hero slideshow images. Adds/removes image files in `public/images/hero/` via the GitHub Contents API (`/api/hero-photos`, GET/POST/DELETE). The slideshow shows every image in that folder, sorted by filename (`src/lib/heroImages.ts`).
@@ -78,6 +78,11 @@ Copy `.env.local.example` → `.env.local` and fill in:
 | `GITHUB_OWNER` | GitHub username/org that owns the repo |
 | `GITHUB_REPO` | Repository name |
 | `ADMIN_PASSWORD` | Password gate for `/admin` |
+| `SESSION_SECRET` | Signs musician-portal session cookies and artist-invite tokens |
+| `RESEND_API_KEY` | Resend key for emailing artist-invite links (optional — without it, admin falls back to a copy-able link) |
+| `INVITE_FROM` | "From" address for invite emails (default: Resend test sender; switch to a `@stormymondaymia.com` address once the domain is verified in Resend) |
+| `INVITE_REPLY_TO` | Where replies to invite emails go (James' email) |
+| `SITE_URL` | Base URL for building invite links (optional; defaults to request origin) |
 
 ## What Needs Real Content (TODOs)
 

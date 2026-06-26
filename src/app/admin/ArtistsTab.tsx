@@ -24,6 +24,15 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
   const [editForm, setEditForm] = useState<Artist | null>(null)
   const [status, setStatus] = useState<SaveStatus>('idle')
 
+  // Invite-a-musician: generate a self-signup link to send to a new artist
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteLink, setInviteLink] = useState('')
+  const [inviteSent, setInviteSent] = useState(false)
+  const [sentTo, setSentTo] = useState('')
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'sending' | 'error'>('idle')
+  const [inviteError, setInviteError] = useState('')
+  const [copied, setCopied] = useState(false)
+
   const d = (dark: string, light: string) => isDark ? dark : light
 
   const inputCls = `w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${
@@ -60,6 +69,48 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
     if (editingId === id) cancelEdit()
   }
 
+  async function sendInvite() {
+    if (!inviteEmail.trim()) return
+    setInviteStatus('sending')
+    setInviteError('')
+    setInviteLink('')
+    setInviteSent(false)
+    setSentTo('')
+    setCopied(false)
+    try {
+      const res = await fetch('/api/artist-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+        body: JSON.stringify({ email: inviteEmail.trim() }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setInviteLink(data.link ?? '')
+        setInviteSent(Boolean(data.sent))
+        setSentTo(data.email ?? inviteEmail.trim())
+        // Surface why email didn't go out, if applicable, while still showing the link
+        if (!data.sent && data.error) setInviteError(data.error)
+        setInviteStatus('idle')
+      } else {
+        setInviteError(data.error || 'Could not create the invite.')
+        setInviteStatus('error')
+      }
+    } catch {
+      setInviteError('Could not create the invite.')
+      setInviteStatus('error')
+    }
+  }
+
+  async function copyInvite() {
+    try {
+      await navigator.clipboard.writeText(inviteLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      /* clipboard blocked — user can select manually */
+    }
+  }
+
   async function save() {
     setStatus('saving')
     try {
@@ -77,6 +128,63 @@ export default function ArtistsTab({ initialArtists, password, isDark }: Props) 
 
   return (
     <div className="grid gap-6">
+
+      {/* Invite a musician — generate a self-signup link to send them */}
+      <div className={`border rounded-lg p-5 ${d('border-gray-700 bg-gray-900', 'border-gray-200 bg-gray-50')}`}>
+        <p className={`text-sm font-semibold mb-1 ${d('text-gray-200', 'text-gray-800')}`}>Invite a musician</p>
+        <p className={`text-xs mb-3 ${d('text-gray-500', 'text-gray-500')}`}>
+          Enter their email and we’ll send them a sign-up link. They fill out their own
+          profile, which is added to the roster automatically.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="email"
+            value={inviteEmail}
+            onChange={e => setInviteEmail(e.target.value)}
+            placeholder="musician@email.com"
+            className={inputCls}
+          />
+          <button
+            onClick={sendInvite}
+            disabled={inviteStatus === 'sending' || !inviteEmail.trim()}
+            className="bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white font-semibold px-5 py-2 rounded text-sm transition-colors whitespace-nowrap"
+          >
+            {inviteStatus === 'sending' ? 'Sending…' : 'Send Invite'}
+          </button>
+        </div>
+        {inviteStatus === 'error' && <p className="text-red-400 text-xs mt-2">{inviteError}</p>}
+
+        {inviteSent && (
+          <p className={`text-xs mt-3 ${d('text-green-400', 'text-green-600')}`}>
+            ✓ Invite emailed to {sentTo}.
+          </p>
+        )}
+
+        {inviteLink && (
+          <div className="mt-3">
+            {!inviteSent && (
+              <p className="text-amber-400 text-xs mb-2">
+                {inviteError ? `Couldn’t email it (${inviteError}). ` : 'Email not configured. '}
+                Copy the link below and send it yourself:
+              </p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input readOnly value={inviteLink} onFocus={e => e.target.select()} className={`${inputCls} font-mono text-xs`} />
+              <button
+                onClick={copyInvite}
+                className={`px-4 py-2 rounded text-sm font-semibold border transition-colors whitespace-nowrap ${
+                  d('border-gray-600 text-gray-200 hover:bg-gray-700', 'border-gray-300 text-gray-700 hover:bg-gray-100')
+                }`}
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <p className={`text-xs mt-2 ${d('text-gray-500', 'text-gray-500')}`}>
+              Link expires in 7 days.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* Artist list */}
       <div className="grid gap-3">
