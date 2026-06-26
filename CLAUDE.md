@@ -16,14 +16,14 @@ Next.js 16 website for Stormy Monday, a cocktail bar and music venue at 820 Alto
 
 ## Color Tokens
 
-Palette follows the 2025 Brand Guidelines (Apartment 302 Creative). Surfaces are built from the brand's Sunburnt Orange, lifted into a warm terracotta ramp so the main background is itself a brand color; Dade Gold is the primary accent and the other brand colors (Miami Green, After Dark, Stormy Blue) live as accents. Values are defined as RGB channels in `src/app/globals.css` and exposed via `tailwind.config.ts`.
+Palette follows the 2025 Brand Guidelines (Apartment 302 Creative). Surfaces use a warm brown ramp (drawn from After Dark) so the room reads warm and welcoming; Dade Gold is the primary accent and the named brand colors live as accents. Values are defined as RGB channels in `src/app/globals.css` and exposed via `tailwind.config.ts`.
 
 | Token | Hex | Usage |
 |-------|-----|-------|
-| `storm-black` | `#8f381e` | Page background (Sunburnt Orange) |
-| `storm-dark` | `#9c4528` | Section backgrounds (lifted orange) |
-| `storm-card` | `#aa522f` | Card backgrounds (raised orange) |
-| `storm-border` | `#bd6a45` | Borders, dividers |
+| `storm-black` | `#14100e` | Page background (warm near-black) |
+| `storm-dark` | `#1e1814` | Section backgrounds |
+| `storm-card` | `#2a211b` | Card backgrounds |
+| `storm-border` | `#3c2f26` | Borders, dividers |
 | `storm-gold` | `#97793f` | Dade Gold — primary accent, CTAs |
 | `storm-gold-light` | `#bd9a5a` | Dade Gold tint — hover state |
 | `storm-cream` | `#f2ede4` | Primary text (warm cream) |
