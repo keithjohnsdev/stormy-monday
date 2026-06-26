@@ -88,20 +88,5 @@
     "coverCharge": "Free",
     "featured": false,
     "status": "draft"
-  },
-  {
-    "id": "1782484155222-vn3nd",
-    "date": "2026-07-06",
-    "startTime": "9pm",
-    "artistId": "artist-keithjohns",
-    "artistName": "Keith Johns",
-    "genre": "Singer/Songwriter",
-    "description": "Miami-raised singer-songwriter delivering emotionally resonant storytelling — soulful, honest lyrics that shift from joyful to introspective. Beautifully layered indie folk with hints of R&B soul.",
-    "artistWebsite": "https://www.keithjohnsmusic.com",
-    "artistPhoto": "/images/artists/artist-keithjohns/photo.jpg",
-    "ticketed": false,
-    "ticketLink": "",
-    "featured": false,
-    "status": "published"
   }
 ]
