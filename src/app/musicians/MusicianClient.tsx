@@ -114,9 +114,9 @@ function LoginForm({ onLogin }: { onLogin: (artist: SessionArtist) => void }) {
         </div>
         <form onSubmit={handleSubmit} className="grid gap-4">
           <div>
-            <label className="text-xs text-storm-muted uppercase tracking-wide block mb-1.5">Email</label>
+            <label className="text-xs text-storm-muted uppercase tracking-wide block mb-1.5">Email or Username</label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={e => setEmail(e.target.value)}
               autoFocus
