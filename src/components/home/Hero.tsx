@@ -9,10 +9,12 @@ const { hero } = content.home
 export default function Hero() {
   const slides = getHeroSlides()
   return (
-    <section className="min-h-screen grid lg:grid-cols-2">
+    <section className="relative">
 
-      {/* Left panel — storm video behind text, heavy overlay keeps it subtle */}
-      <div className="relative flex items-center justify-center px-10 sm:px-16 py-20 pt-28 lg:pt-20 overflow-hidden">
+      {/* Top band — title, tagline & buttons over storm video.
+          Full screen on mobile; on desktop it shares the viewport with the
+          photo band below (horizontal split). */}
+      <div className="relative flex items-center lg:items-start justify-center px-10 sm:px-16 pb-16 pt-36 lg:pt-36 lg:pb-14 overflow-hidden min-h-screen lg:min-h-[58vh]">
 
         {/* Video background — slowed to 0.4x in SlowVideo */}
         <SlowVideo className="absolute inset-0 w-full h-full object-cover" />
@@ -20,8 +22,11 @@ export default function Hero() {
         {/* Dark overlay — mutes the video so text reads cleanly */}
         <div className="absolute inset-0 bg-storm-black/60 pointer-events-none" />
 
+        {/* Fade the storm clouds into the black photo band below (desktop) */}
+        <div className="absolute inset-x-0 bottom-0 h-[75px] bg-gradient-to-b from-transparent to-storm-black pointer-events-none hidden lg:block" />
+
         {/* Text content */}
-        <div className="relative z-10 max-w-md w-full text-center lg:text-left">
+        <div className="relative z-10 max-w-2xl w-full text-center">
 
           {/* Compass logo — uncomment when hi-res transparent file arrives from James
           <div
@@ -53,7 +58,7 @@ export default function Hero() {
           </h1>
 
           <div
-            className="gold-divider mx-auto lg:mx-0 animate-fade-up"
+            className="gold-divider mx-auto animate-fade-up"
             style={{ animationDelay: '320ms' }}
           />
 
@@ -65,7 +70,7 @@ export default function Hero() {
           </p>
 
           <div
-            className="flex flex-col sm:flex-row gap-4 items-center lg:items-start animate-fade-up"
+            className="flex flex-col sm:flex-row gap-4 items-center justify-center animate-fade-up"
             style={{ animationDelay: '580ms' }}
           >
             <Link href="/reservations" className="btn-primary w-full sm:w-auto text-center">
@@ -79,10 +84,16 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Right panel — animated photo collage (desktop only) */}
-      <div className="relative bg-storm-dark hidden lg:block overflow-hidden">
-        <div className="absolute inset-0">
-          <HeroSlideshow slides={slides} />
+      {/* Bottom band — two squares filling the width (no gap) up to a max width,
+          then centered; swapping on interlaced timing (desktop only) */}
+      <div className="bg-storm-black hidden lg:flex justify-center py-12">
+        <div className="w-full max-w-6xl flex">
+          <div className="relative w-1/2 aspect-square overflow-hidden">
+            <HeroSlideshow slides={slides} startIndex={0} phaseMs={6000} />
+          </div>
+          <div className="relative w-1/2 aspect-square overflow-hidden">
+            <HeroSlideshow slides={slides} startIndex={Math.floor(slides.length / 2)} phaseMs={3000} />
+          </div>
         </div>
       </div>
 
